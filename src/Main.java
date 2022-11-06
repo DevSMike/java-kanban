@@ -1,6 +1,7 @@
 import model.Epic;
 import model.Subtask;
 import model.Task;
+import service.StatusManager;
 import service.TaskManager;
 
 public class Main {
@@ -15,30 +16,35 @@ public class Main {
         Epic epicN1 = new Epic("Купить подарки на НГ", "Составить список");
         Subtask subtaskEpicN1N1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете");
         Subtask subtaskEpicN1N2 = new Subtask("Купить ленточку","Заказать на Яндекс Маркете");
+
+        taskManager.addNewEpicItem(epicN1);
+        subtaskEpicN1N1.setEpicId(epicN1.getId());
+        subtaskEpicN1N2.setEpicId(epicN1.getId());
         taskManager.addNewSubtaskItem(subtaskEpicN1N1);
         taskManager.addNewSubtaskItem(subtaskEpicN1N2);
-        epicN1.setItems(subtaskEpicN1N1.getTaskId());
-        epicN1.setItems(subtaskEpicN1N2.getTaskId());
-        taskManager.addNewEpicItem(epicN1);
 
         Epic epicN2 = new Epic("Продумать отдых", "Составить список");
         Subtask subtaskEpicN2N1 = new Subtask("Погулять в парке", "После учебы");
-        taskManager.addNewSubtaskItem(subtaskEpicN2N1);
-        epicN2.setItems(subtaskEpicN2N1.getTaskId());
         taskManager.addNewEpicItem(epicN2);
+        subtaskEpicN2N1.setEpicId(epicN2.getId());
+        taskManager.addNewSubtaskItem(subtaskEpicN2N1);
 
         printAllTasksInfo(taskManager);
 
-        taskManager.setTaskStatus(Task.Statuses.IN_PROGRESS, taskN1);
-        taskManager.setTaskStatus(Task.Statuses.DONE, taskN2);
-        taskManager.setSubtaskStatus(Task.Statuses.IN_PROGRESS, subtaskEpicN1N1);
-        taskManager.setSubtaskStatus(Task.Statuses.DONE, subtaskEpicN2N1);
+        taskManager.setTaskStatus(StatusManager.Statuses.IN_PROGRESS, taskN1);
+        taskManager.setTaskStatus(StatusManager.Statuses.DONE, taskN2);
+        taskManager.setSubtaskStatus(StatusManager.Statuses.IN_PROGRESS, subtaskEpicN1N1);
+        taskManager.setSubtaskStatus(StatusManager.Statuses.DONE, subtaskEpicN2N1);
 
         System.out.println("_____ПОСЛЕ СМЕНЫ СТАТУСОВ_____");
         printAllTasksInfo(taskManager);
 
-        taskManager.deleteTaskById(taskN2.getTaskId());
-        taskManager.deleteEpicById(epicN2.getTaskId());
+        System.out.println("_____ПОСЛЕ ОБНОВЛЕНИЯ  ЭПИКОВ_____");
+        Epic epicN3 = new Epic("Тренировка", "План пробежки");
+        taskManager.updateEpic(epicN2,epicN3);
+        printAllTasksInfo(taskManager);
+        taskManager.deleteTaskById(taskN2.getId());
+        taskManager.deleteEpicById(epicN2.getId());
 
         System.out.println("_____ПОСЛЕ УДАЛЕНИЯ_____");
         printAllTasksInfo(taskManager);
@@ -46,11 +52,11 @@ public class Main {
 
     public static void printAllTasksInfo(TaskManager taskManager) {
         System.out.println("Списки всех задач:");
-        System.out.println(taskManager.printAllTasks());
+        System.out.println(taskManager.getTasks());
         System.out.println("Списки всех эпиков:");
-        System.out.println(taskManager.printAllEpics());
+        System.out.println(taskManager.getEpics());
         System.out.println("Списки всех подзадач:");
-        System.out.println(taskManager.printAllSubtasks());
+        System.out.println(taskManager.getSubtasks());
     }
 
 
