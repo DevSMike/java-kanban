@@ -1,61 +1,56 @@
 package model;
 
+import service.StatusManager;
+
 import java.util.Objects;
 
 public class Task {
-   protected String taskName;
-   protected String taskDescription;
-   protected int taskId;
-   protected  String curStatus;
-   protected  String[] taskStatuses = { "NEW", "IN_PROGRESS", "DONE" };
+    protected int id;
+    protected String name;
+    protected String description;
+    protected  String status;
 
-   public enum Statuses {
-       NEW,
-       IN_PROGRESS,
-       DONE
-   }
-    public Task(String taskName, String taskDescription) {
-       this.taskName = taskName;
-       this.taskDescription = taskDescription;
+    public Task(String name, String description) {
+       this.name = name;
+       this.description = description;
     }
 
-    public void setStatus(int index) {
-        curStatus = taskStatuses[index];
+    public void setStatus(StatusManager.Statuses id) {
+        status = StatusManager.getStatusId(id);
+    }
+    public String getStatus() {
+        return status;
+    }
+    public String getName() {
+        return name;
     }
 
-    public String getCurStatus() {
-        return curStatus;
-    }
-    public String getTaskName() {
-        return taskName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
+    public String getDescription() {
+        return description;
     }
 
-    public String getTaskDescription() {
-        return taskDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public void setTaskDescription(String taskDescription) {
-        this.taskDescription = taskDescription;
+    public int getId() {
+        return id;
     }
 
-    public int getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(int taskId) {
-        this.taskId = taskId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
     public String toString() {
         return "Task{" +
-                "taskName='" + taskName + '\'' +
-                ", taskDescription='" + taskDescription + '\'' +
-                ", curStatus='" + curStatus + '\'' +
+                "taskName='" + name + '\'' +
+                ", taskDescription='" + description + '\'' +
+                ", status='" + status + '\'' +
                "}\n";
     }
 
@@ -64,14 +59,14 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return taskId == task.taskId
-                && Objects.equals(taskName, task.taskName)
-                && Objects.equals(taskDescription, task.taskDescription)
-                && Objects.equals(curStatus, task.curStatus);
+        return id == task.id
+                && Objects.equals(name, task.name)
+                && Objects.equals(description, task.description)
+                && Objects.equals(status, task.status);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(taskName, taskDescription, taskId, curStatus);
+        return Objects.hash(name, description, id, status);
     }
 }
