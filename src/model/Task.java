@@ -18,8 +18,8 @@ public class Task {
     public void setStatus(StatusManager.Statuses id) {
         status = StatusManager.getStatusId(id);
     }
-    public String getStatus() {
-        return status;
+    public StatusManager.Statuses getStatus() {
+        return StatusManager.getStatusIdByString(status);
     }
     public String getName() {
         return name;
