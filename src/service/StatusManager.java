@@ -17,4 +17,16 @@ public class StatusManager {
             default: return "NULL";
         }
     }
+
+    public static Statuses getStatusIdByString(String status) {
+        switch(status) {
+            case "NEW":
+                return Statuses.NEW;
+            case "IN_PROGRESS":
+                return Statuses.IN_PROGRESS;
+            case "DONE":
+                return Statuses.DONE;
+            default: return null;
+        }
+    }
 }
