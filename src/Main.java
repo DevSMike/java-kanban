@@ -41,7 +41,12 @@ public class Main {
 
         System.out.println("_____ПОСЛЕ ОБНОВЛЕНИЯ  ЭПИКОВ_____");
         Epic epicN3 = new Epic("Тренировка", "План пробежки");
-        taskManager.updateEpic(epicN2,epicN3);
+        epicN3.setId(epicN2.getId());
+        taskManager.updateEpic(epicN3);
+        Subtask subtaskEpicN3N1 = new Subtask("Пробежка", "Тренировка в лесу");
+        subtaskEpicN3N1.setId(subtaskEpicN2N1.getId());
+        subtaskEpicN3N1.setStatus(subtaskEpicN2N1.getStatus());
+        taskManager.updateSubtask(subtaskEpicN3N1);
         printAllTasksInfo(taskManager);
         taskManager.deleteTaskById(taskN2.getId());
         taskManager.deleteEpicById(epicN2.getId());
