@@ -115,36 +115,26 @@ public class TaskManager {
         return subtaskForEpic;
     }
 
-    public void updateTask(Task newTask) {
-        if (!tasks.containsKey(newTask.getId())) {
+    public void updateTask(Task task) {
+        if (!tasks.containsKey(task.getId())) {
            return;
         }
-        tasks.put(newTask.getId(), newTask);
+        tasks.put(task.getId(), task);
     }
 
-    public void updateEpic(Epic newEpic) {
-        if (!epics.containsKey(newEpic.getId())) {
+    public void updateEpic(Epic epic) {
+        if (!epics.containsKey(epic.getId())) {
             return;
         }
-        Epic oldEpic = epics.get(newEpic.getId());
-        if (oldEpic.getSubtaskIds() != null) {
-            for (int id : oldEpic.getSubtaskIds()) {
-                newEpic.setSubtaskIds(id);
-            }
-        }
-        epics.put(newEpic.getId(), newEpic);
-        updateEpicStatus(newEpic);
+        epics.put(epic.getId(), epic);
     }
 
-    public void updateSubtask(Subtask newSubtask) {
-        if (!subtasks.containsKey(newSubtask.getId())) {
+    public void updateSubtask(Subtask subtask) {
+        if (!subtasks.containsKey(subtask.getId()) && !epics.containsKey(subtask.getEpicId())) {
             return;
         }
-        Subtask oldSubtask = subtasks.get(newSubtask.getId());
-        newSubtask.setEpicId(oldSubtask.getEpicId());
-        subtasks.put(newSubtask.getId(), newSubtask);
-        Epic epic = epics.get(newSubtask.getEpicId());
-        updateEpicStatus(epic);
+        subtasks.put(subtask.getId(), subtask);
+        updateEpicStatus(epics.get(subtask.getEpicId()));
     }
 
     public void setTaskStatus(StatusManager.Statuses status, Task task) {
