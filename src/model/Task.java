@@ -16,7 +16,7 @@ public class Task {
     }
 
     public void setStatus(StatusManager.Statuses id) {
-        status = StatusManager.getStatusId(id);
+        status = StatusManager.getStatusStringById(id);
     }
     public StatusManager.Statuses getStatus() {
         return StatusManager.getStatusIdByString(status);
