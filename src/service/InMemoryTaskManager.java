@@ -7,11 +7,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
-    private static final int MAX_TASKS_IN_HISTORY = 10;
+
     protected HashMap<Integer, Task> tasks = new HashMap<>();
     protected HashMap<Integer, Epic> epics = new HashMap<>();
     protected HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    protected ArrayList<Task> tasksHistory = new ArrayList<>();
+
+   //такой вариант создания предложила Идея. Я правильно понимаю, что это значит -
+   // HistoryManager не может быть присвоено новое значение и это просто более хороашя практика кода?
+    private  HistoryManager historyManager = Managers.getDefaultHistory();
     protected int nextId = 1;
 
     @Override
@@ -73,22 +76,19 @@ public class InMemoryTaskManager implements TaskManager {
     }
     @Override
     public Task getTaskById(int id) {
-        checkTasksHistory(tasksHistory);
-        tasksHistory.add(tasks.get(id));
+        historyManager.add(tasks.get(id));
         return tasks.get(id);
     }
 
     @Override
     public Epic getEpicById(int id) {
-        checkTasksHistory(tasksHistory);
-        tasksHistory.add(epics.get(id));
+        historyManager.add(epics.get(id));
         return epics.get(id);
     }
 
     @Override
     public Subtask getSubtaskById(int id) {
-        checkTasksHistory(tasksHistory);
-        tasksHistory.add(subtasks.get(id));
+        historyManager.add(subtasks.get(id));
         return  subtasks.get(id);
     }
 
@@ -179,18 +179,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getHistory() {
-        return  tasksHistory;
+    public HistoryManager getHistoryManager() {
+        return historyManager;
     }
-
-    private void checkTasksHistory(ArrayList<Task> tasksHistory) {
-        int firstId = 0;
-        if (tasksHistory.size() >= MAX_TASKS_IN_HISTORY) {
-            while (tasksHistory.size() != MAX_TASKS_IN_HISTORY - 1) {
-                tasksHistory.remove(firstId);
-            }
-        }
-    }
-
-
 }
