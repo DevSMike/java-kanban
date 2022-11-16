@@ -13,6 +13,7 @@ public class Main {
 
         TaskManager taskManager = Managers.getDefault();
 
+
         Task taskN1 = new Task("Прогулка", "Сходить в лес");
         Task taskN2 = new Task("Почитать", "Чтение перед сном");
         taskManager.addNewTaskItem(taskN1);
@@ -60,7 +61,7 @@ public class Main {
         printAllTasksInfo(taskManager);
 
         System.out.println();
-        System.out.println("-------ПРОВЕРКА GetHistory() из 10 элементов------");
+        System.out.println("-------ПРОВЕРКА GetHistory() на повторяющиеся заадчи ------");
         taskManager.getTaskById(taskN1.getId());
         taskManager.getTaskById(taskN2.getId());
 
@@ -72,12 +73,9 @@ public class Main {
         taskManager.getEpicById(epicN1.getId());
         taskManager.getEpicById(epicN3.getId());
         taskManager.getTaskById(taskN1.getId());
-        Printer.printTaskHistory(taskManager.getHistory());
 
-        System.out.println();
-        System.out.println("-------ПРОВЕРКА GetHistory() после добавления 11 элемента------");
-        taskManager.getSubtaskById(subtaskEpicN1N1.getId());
-        Printer.printTaskHistory(taskManager.getHistory());
+        Printer.printTaskHistory(taskManager.getHistoryManager().getHistory()) ;
+
 
         taskManager.deleteTaskById(taskN2.getId());
         taskManager.deleteEpicById(epicN2.getId());
