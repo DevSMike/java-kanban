@@ -31,5 +31,6 @@ public interface TaskManager {
      void updateSubtask(Subtask subtask);
      void setTaskStatus(StatusManager.Statuses status, Task task);
      void setSubtaskStatus(StatusManager.Statuses status, Subtask subtask);
-     ArrayList<Task> getHistory();
+     HistoryManager getHistoryManager();
+
 }
