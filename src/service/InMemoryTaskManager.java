@@ -5,15 +5,14 @@ import model.Subtask;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    protected HashMap<Integer, Task> tasks = new HashMap<>();
-    protected HashMap<Integer, Epic> epics = new HashMap<>();
-    protected HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    private HashMap<Integer, Task> tasks = new HashMap<>();
+    private HashMap<Integer, Epic> epics = new HashMap<>();
+    private HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
-   //такой вариант создания предложила Идея. Я правильно понимаю, что это значит -
-   // HistoryManager не может быть присвоено новое значение и это просто более хороашя практика кода?
     private  HistoryManager historyManager = Managers.getDefaultHistory();
     protected int nextId = 1;
 
@@ -179,7 +178,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public HistoryManager getHistoryManager() {
-        return historyManager;
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
     }
 }
