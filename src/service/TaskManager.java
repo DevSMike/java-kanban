@@ -19,11 +19,9 @@ public interface TaskManager {
      ArrayList<Epic> getEpics();
 
      ArrayList<Subtask> getSubtasks();
-
      void deleteTasks();
 
      void deleteEpics();
-
      void deleteSubtasks();
 
      Task getTaskById(int id);
@@ -53,5 +51,4 @@ public interface TaskManager {
      void setSubtaskStatus(StatusManager.Statuses status, Subtask subtask);
 
      HistoryManager getHistoryManager();
-
 }
