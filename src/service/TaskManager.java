@@ -5,6 +5,7 @@ import model.Subtask;
 import model.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
 
@@ -52,5 +53,5 @@ public interface TaskManager {
 
      void setSubtaskStatus(StatusManager.Statuses status, Subtask subtask);
 
-     HistoryManager getHistoryManager();
+     List<Task> getHistory();
 }
