@@ -5,10 +5,11 @@ import model.Subtask;
 import model.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Printer {
 
-    public static void printTaskHistory(ArrayList<Task> tasksHistory) {
+    public static void printTaskHistory(List<Task> tasksHistory) {
         int indexNumber = 0;
         for (Task task : tasksHistory) {
             if (task instanceof Epic) {
