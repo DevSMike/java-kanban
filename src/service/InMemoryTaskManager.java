@@ -90,7 +90,6 @@ public class InMemoryTaskManager implements TaskManager {
         historyManager.add(subtasks.get(id));
         return  subtasks.get(id);
     }
-
     @Override
     public void updateEpicStatus(Epic epic) {
         boolean isNewStatus = false;
