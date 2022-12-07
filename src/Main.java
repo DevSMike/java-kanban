@@ -14,6 +14,8 @@ public class Main {
         TaskManager taskManager = Managers.getDefault();
 
 
+
+
         Task taskN1 = new Task("Прогулка", "Сходить в лес");
         Task taskN2 = new Task("Почитать", "Чтение перед сном");
         taskManager.addNewTaskItem(taskN1);
@@ -51,38 +53,32 @@ public class Main {
         epicN3.setId(epicN2.getId());
         epicN3.updateSubtaskIds(epicN2);
         taskManager.updateEpic(epicN3);
+        epicN2 = null;
 
         Subtask subtaskEpicN3N1 = new Subtask("Пробежка", "Тренировка в лесу");
         subtaskEpicN3N1.setId(subtaskEpicN2N1.getId());
         subtaskEpicN3N1.setStatus(subtaskEpicN2N1.getStatus());
         subtaskEpicN3N1.setEpicId(subtaskEpicN2N1.getEpicId());
         taskManager.updateSubtask(subtaskEpicN3N1);
+        subtaskEpicN2N1 = null;
 
         printAllTasksInfo(taskManager);
 
         System.out.println();
-        System.out.println("-------ПРОВЕРКА GetHistory() (10 элементов ) ------");
+
         taskManager.getTaskById(taskN1.getId());
         taskManager.getTaskById(taskN2.getId());
         taskManager.getSubtaskById(subtaskEpicN1N1.getId());
-        taskManager.getSubtaskById(subtaskEpicN2N1.getId());
         taskManager.getSubtaskById(subtaskEpicN3N1.getId());
         taskManager.getEpicById(epicN1.getId());
-        taskManager.getEpicById(epicN2.getId());
         taskManager.getEpicById(epicN1.getId());
         taskManager.getEpicById(epicN3.getId());
         taskManager.getTaskById(taskN1.getId());
+        taskManager.getTaskById(taskN1.getId());
+        taskManager.getTaskById(taskN2.getId());
+        taskManager.getEpicById(epicN3.getId());
 
         Printer.printTaskHistory(taskManager.getHistory());
-
-        taskManager.getEpicById(epicN1.getId());
-        System.out.println("-------ПРОВЕРКА GetHistory() (при добавлении 11 элемента ) ------");
-        Printer.printTaskHistory(taskManager.getHistory());
-
-        taskManager.deleteTaskById(taskN2.getId());
-        taskManager.deleteEpicById(epicN2.getId());
-        System.out.println("_____ПОСЛЕ УДАЛЕНИЯ_____");
-        printAllTasksInfo(taskManager);
     }
 
     public static void printAllTasksInfo(TaskManager inMemoryTaskManager) {
