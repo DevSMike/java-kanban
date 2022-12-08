@@ -7,9 +7,10 @@ import java.util.HashMap;
 
 public class InMemoryHistoryManager implements  HistoryManager  {
 
+    private final HashMap<Integer, Node<Task>> uniqueTasks = new HashMap<>();
     private Node<Task> tail = null;
     private Node<Task> head = null;
-    private final HashMap<Integer, Node<Task>> uniqueTasks = new HashMap<>();
+
     @Override
     public ArrayList<Task> getHistory() {
         return  getTasks();
@@ -17,24 +18,18 @@ public class InMemoryHistoryManager implements  HistoryManager  {
 
     @Override
     public void add(Task task) {
+        if (task == null) {
+            return;
+        }
         if (uniqueTasks.containsKey(task.getId())) {
-            removeNode(getNode(task));
+            remove(task.getId());
         }
         linkLast(task);
     }
 
     @Override
     public void remove (int id) {
-        removeNode(uniqueTasks.get(id));
-    }
-
-    private Node<Task> getNode(Task task) {
-        for (Node<Task> current = head; current != null; current = current.next) {
-            if (current.data == task) {
-                return current;
-            }
-        }
-        return null;
+        removeNode(id);
     }
 
     public void linkLast(Task task) {
@@ -50,8 +45,8 @@ public class InMemoryHistoryManager implements  HistoryManager  {
         uniqueTasks.put(node.data.getId(), node);
     }
 
-    public void removeNode(Node<Task> node) {
-
+    public void removeNode(int id) {
+        Node node = uniqueTasks.remove(id);
         if (node == head) {
             head = head.next;
         } else if (node == tail) {
