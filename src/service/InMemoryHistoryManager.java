@@ -47,14 +47,17 @@ public class InMemoryHistoryManager implements  HistoryManager  {
 
     private void removeNode(int id) {
         Node node = uniqueTasks.remove(id);
+
         if (node == head) {
             head = head.next;
         } else if (node == tail) {
             tail = tail.prev;
         } else {
             node.prev.next = node.next;
+            node.next.prev = node.prev;;
         }
         node.data = null;
+
     }
 
     private ArrayList<Task> getTasks() {
