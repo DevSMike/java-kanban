@@ -79,6 +79,10 @@ public class Main {
         taskManager.getEpicById(epicN3.getId());
 
         Printer.printTaskHistory(taskManager.getHistory());
+        System.out.println();
+
+        taskManager.deleteTaskById(taskN2.getId());
+        Printer.printTaskHistory(taskManager.getHistory());
     }
 
     public static void printAllTasksInfo(TaskManager inMemoryTaskManager) {
