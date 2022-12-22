@@ -8,6 +8,10 @@ public class Subtask extends Task {
         super(taskName, taskDescription);
     }
 
+    public Subtask (int id, String name, String status, String description, int epicId) {
+        super(id, name, status, description);
+        this.epicId = epicId;
+    }
     public int getEpicId() {
         return epicId;
     }
@@ -25,5 +29,10 @@ public class Subtask extends Task {
                 ", description='" + description + '\'' +
                 ", status='" + status + '\'' +
                 "}\n";
+    }
+
+    @Override
+    public String toStringForFile() {
+        return super.toStringForFile() + "\b" + epicId;
     }
 }
