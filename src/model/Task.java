@@ -15,6 +15,12 @@ public class Task {
        this.description = description;
     }
 
+    public Task(int id, String name, String status, String description) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+        this.description = description;
+    }
     public void setStatus(StatusManager.Statuses id) {
         status = StatusManager.getStatusStringById(id);
     }
@@ -68,5 +74,9 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hash(name, description, id, status);
+    }
+
+    public String toStringForFile() {
+        return id + "\b" + name + "\b" + status + "\b" + description;
     }
 }
