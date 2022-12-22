@@ -10,6 +10,10 @@ public class Epic extends Task {
         super(taskName, taskDescription);
     }
 
+    public Epic (int id, String name, String status, String description) {
+        super(id, name, status, description);
+    }
+
     public void setSubtaskIds(int itemId) {
         subtaskIds.add(itemId);
     }
@@ -50,5 +54,9 @@ public class Epic extends Task {
                 ", description='" + description + '\'' +
                 ", status='" + status + '\'' +
                 "}\n";
+    }
+    @Override
+    public String toStringForFile() {
+        return super.toStringForFile();
     }
 }
