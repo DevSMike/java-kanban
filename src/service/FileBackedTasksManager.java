@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class FileBackedTasksManager  extends InMemoryTaskManager implements TaskManager {
+
     private static final String PATH = "src/resources/tasksData.csv";
     private final List<Integer> allIds = new ArrayList<>();
 
@@ -35,6 +36,7 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
             System.out.println("Ошибка в методе save()");
         }
     }
+
     private String allTasksToString () {
         StringBuilder taskString = new StringBuilder("id,type,name,status,description,epic\n");
         for (int id : allIds) {
@@ -66,6 +68,7 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
         }
         return historyString.toString();
     }
+
     private String readDataFromFile () {
         try {
             return Files.readString(Path.of(PATH));
@@ -74,6 +77,7 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
             return null;
         }
     }
+
     private void isCanReadDataFile() {
         String data = readDataFromFile();
         if (data == null) { return; }
@@ -96,6 +100,7 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
             }
         }
     }
+
     private List<Task> historyFromString(String value) {
         String[] params = value.split(",");
         for (String param : params) {
@@ -110,20 +115,24 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
         }
         return historyManager.getHistory();
     }
+
     private void fromStringEpic (String[] params) {
         Epic epic = new Epic(Integer.parseInt(params[0]), params[2], params[3], params[4]);
         epics.put(epic.getId(), epic);
     }
+
     private void fromStringTask (String[] params) {
         Task task = new Task(Integer.parseInt(params[0]), params[2], params[3], params[4]);
         tasks.put(task.getId(), task);
     }
+
     private void fromStringSubtask (String[] params) {
         Subtask subtask = new Subtask(Integer.parseInt(params[0]), params[2], params[3], params[4]
                                       ,Integer.parseInt(params[5].trim()));
         subtasks.put(subtask.getId(), subtask);
         epics.get(subtask.getEpicId()).setSubtaskIds(subtask.getId());
     }
+
     @Override
     public void addNewTaskItem(Task task) {
         super.addNewTaskItem(task);
@@ -154,6 +163,7 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
     public ArrayList<Epic> getEpics() {
         return super.getEpics();
     }
+
     @Override
     public ArrayList<Subtask> getSubtasks() {
         return super.getSubtasks();
