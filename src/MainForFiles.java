@@ -3,13 +3,19 @@ import model.Subtask;
 import model.Task;
 import service.*;
 
-import javax.sound.midi.Soundbank;
+
+import java.io.File;
+import java.io.IOException;
 
 public class MainForFiles {
-    public static void main(String[] args) {
 
-        FileBackedTasksManager fbManager = new FileBackedTasksManager();
+    private static final String PATH = "src/resources/tasksData.csv";
+    public static void main(String[] args) throws IOException {
 
+        File file = new File(PATH);
+        File file2 = new File ("src/resources/tasksData2.csv");
+
+        FileBackedTasksManager fbManager = new FileBackedTasksManager(file);
         Main.printAllTasksInfo(fbManager);
         Printer.printTaskHistory(fbManager.getHistory());
 
@@ -39,6 +45,25 @@ public class MainForFiles {
         System.out.println();
         Main.printAllTasksInfo(fbManager);
         Printer.printTaskHistory(fbManager.getHistory());
+
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        System.out.println("Создаеём новый менеджер по данным старого!");
+        FileBackedTasksManager newFb = new FileBackedTasksManager(file);
+        try {
+            newFb = FileBackedTasksManager.loadFromFile(file);
+        } catch (IOException e) {
+            System.out.println("Считать информацию из файла - невышло. Создался обычный экземпляр FileBackedManager");
+        }
+        Task task3 = new Task("Одых", "Украсить ёлку");
+        newFb.addNewTaskItem(task3);
+        Main.printAllTasksInfo(newFb);
+        Printer.printTaskHistory(newFb.getHistory());
+
+        System.out.println("\n Третий файл менеджер");
+        FileBackedTasksManager tempFb = new FileBackedTasksManager(file2);
+        Task taskN3 = new Task("Поиграть", "КС");
+        tempFb.addNewTaskItem(taskN3);
+        System.out.println(tempFb.getTasks());
 
     }
 }
