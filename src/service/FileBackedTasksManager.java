@@ -14,7 +14,6 @@ import java.util.List;
 
 public class FileBackedTasksManager  extends InMemoryTaskManager implements TaskManager {
 
-    // private final List<Integer> allIds = new ArrayList<>();
     private final  File taskData;
 
     enum TaskNames {
