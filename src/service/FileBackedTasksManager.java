@@ -14,7 +14,7 @@ import java.util.List;
 
 public class FileBackedTasksManager  extends InMemoryTaskManager implements TaskManager {
 
-    private final List<Integer> allIds = new ArrayList<>();
+    // private final List<Integer> allIds = new ArrayList<>();
     private final  File taskData;
 
     enum TaskNames {
@@ -42,20 +42,23 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
         }
     }
 
+
+
     private String allTasksToString () {
         StringBuilder taskString = new StringBuilder("id,type,name,status,description,epic\n");
-        for (int id : allIds) {
-            if (tasks.containsKey(id)) {
-                String[] params = tasks.get(id).toStringForFile().split("\b");
+        int collectionsLength = tasks.size() + epics.size() + subtasks.size();
+        for (int i = 1; i <= collectionsLength; i++) {
+            if (tasks.containsKey(i)) {
+                String[] params = tasks.get(i).toStringForFile().split("\b");
                 taskString.append(params[0]).append(",").append(TaskNames.TASK).append(",")
                         .append(params[1]).append(",").append(params[2]).append(",").append(params[3]).append(",")
                         .append("\n");
-            } else if (epics.containsKey(id)) {
-                String[] params = epics.get(id).toStringForFile().split("\b");
+            } else if (epics.containsKey(i)) {
+                String[] params = epics.get(i).toStringForFile().split("\b");
                 taskString.append(params[0]).append(",").append(TaskNames.EPIC).append(",").append(params[1]).append(",")
                         .append(params[2]).append(",").append(params[3]).append(",").append("\n");
-            } else if (subtasks.containsKey(id)) {
-                String[] params = subtasks.get(id).toStringForFile().split("\b");
+            } else if (subtasks.containsKey(i)) {
+                String[] params = subtasks.get(i).toStringForFile().split("\b");
                 taskString.append(params[0]).append(",").append(TaskNames.SUBTASK).append(",").append(params[1])
                         .append(",").append(params[2]).append(",").append(params[3]).append(",").append(params[4])
                         .append(",").append("\n");
@@ -146,21 +149,18 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
     @Override
     public void addNewTaskItem(Task task) {
         super.addNewTaskItem(task);
-        allIds.add(task.getId());
         save();
     }
 
     @Override
     public void addNewEpicItem(Epic epic) {
         super.addNewEpicItem(epic);
-        allIds.add(epic.getId());
         save();
     }
 
     @Override
     public void addNewSubtaskItem(Subtask subtask) {
         super.addNewSubtaskItem(subtask);
-        allIds.add(subtask.getId());
         save();
     }
 
@@ -181,27 +181,18 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
 
     @Override
     public void deleteTasks() {
-        for (Task task : tasks.values()) {
-            allIds.remove(task.getId());
-        }
         super.deleteTasks();
         save();
     }
 
     @Override
     public void deleteEpics() {
-        for (Epic epic : epics.values()) {
-            allIds.remove(epic.getId());
-        }
         super.deleteEpics();
         save();
     }
 
     @Override
     public void deleteSubtasks() {
-        for (Subtask subtask : subtasks.values()) {
-            allIds.remove(subtask.getId());
-        }
         super.deleteSubtasks();
         save();
     }
@@ -235,21 +226,18 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
 
     @Override
     public void deleteTaskById(int id) {
-        allIds.remove(id);
         super.deleteTaskById(id);
         save();
     }
 
     @Override
     public void deleteEpicById(int id) {
-        allIds.remove(id);
         super.deleteEpicById(id);
         save();
     }
 
     @Override
     public void deleteSubtaskById(int id) {
-        allIds.remove(id);
         super.deleteSubtaskById(id);
         save();
     }
