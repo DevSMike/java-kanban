@@ -21,12 +21,14 @@ public class Task {
         this.status = status;
         this.description = description;
     }
+
     public void setStatus(StatusManager.Statuses id) {
         status = StatusManager.getStatusStringById(id);
     }
     public StatusManager.Statuses getStatus() {
         return StatusManager.getStatusIdByString(status);
     }
+
     public String getName() {
         return name;
     }
@@ -76,7 +78,11 @@ public class Task {
         return Objects.hash(name, description, id, status);
     }
 
-    public String toStringForFile() {
-        return id + "\b" + name + "\b" + status + "\b" + description;
+    public Integer getEpicId () {
+        return -1;
+    }
+
+    public String getType () {
+        return "TASK";
     }
 }

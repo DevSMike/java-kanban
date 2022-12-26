@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Epic extends Task {
     // Для хранения индексов сабтасков
-    protected   ArrayList<Integer> subtaskIds = new ArrayList<>();
+    protected  ArrayList<Integer> subtaskIds = new ArrayList<>();
 
     public Epic(String taskName, String taskDescription) {
         super(taskName, taskDescription);
@@ -17,9 +17,11 @@ public class Epic extends Task {
     public void setSubtaskIds(int itemId) {
         subtaskIds.add(itemId);
     }
+
     public void updateSubtaskIds(Epic o) {
         this.subtaskIds = o.subtaskIds;
     }
+
     public ArrayList<Integer> getSubtaskIds() {
         return subtaskIds;
     }
@@ -27,6 +29,7 @@ public class Epic extends Task {
     public int getIemByIndex(int i) {
         return subtaskIds.get(i);
     }
+
     public void deleteSubtaskIds() {
         subtaskIds.clear();
     }
@@ -55,8 +58,9 @@ public class Epic extends Task {
                 ", status='" + status + '\'' +
                 "}\n";
     }
+
     @Override
-    public String toStringForFile() {
-        return super.toStringForFile();
+    public String getType () {
+        return "EPIC";
     }
 }
