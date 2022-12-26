@@ -16,17 +16,12 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
 
     private final  File taskData;
 
-    enum TaskNames {
-        TASK,
-        EPIC,
-        SUBTASK
-    }
-
-    public FileBackedTasksManager(File file) throws IOException {
+    public FileBackedTasksManager(File file)  {
         if (!file.exists()) {
-            boolean fileCreated = file.createNewFile();
-            if (!fileCreated) {
-                throw new IOException();
+            try {
+                 file.createNewFile();
+           } catch (IOException e) {
+                throw new FileCreationException("Ошибка создания нового файла при создании FileBackedManager");
             }
         }
         taskData = file;
@@ -41,32 +36,31 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
         }
     }
 
-
-
     private String allTasksToString () {
         StringBuilder taskString = new StringBuilder("id,type,name,status,description,epic\n");
         int collectionsLength = tasks.size() + epics.size() + subtasks.size();
         for (int i = 1; i <= collectionsLength; i++) {
             if (tasks.containsKey(i)) {
-                String[] params = tasks.get(i).toStringForFile().split("\b");
-                taskString.append(params[0]).append(",").append(TaskNames.TASK).append(",")
-                        .append(params[1]).append(",").append(params[2]).append(",").append(params[3]).append(",")
-                        .append("\n");
+                taskString.append(taskToString(tasks.get(i)));
             } else if (epics.containsKey(i)) {
-                String[] params = epics.get(i).toStringForFile().split("\b");
-                taskString.append(params[0]).append(",").append(TaskNames.EPIC).append(",").append(params[1]).append(",")
-                        .append(params[2]).append(",").append(params[3]).append(",").append("\n");
+                taskString.append(taskToString(epics.get(i)));
             } else if (subtasks.containsKey(i)) {
-                String[] params = subtasks.get(i).toStringForFile().split("\b");
-                taskString.append(params[0]).append(",").append(TaskNames.SUBTASK).append(",").append(params[1])
-                        .append(",").append(params[2]).append(",").append(params[3]).append(",").append(params[4])
-                        .append(",").append("\n");
+                taskString.append(taskToString(subtasks.get(i)));
             } else {
                 System.out.println("Ошибочный id");
             }
         }
-
         return taskString + "\n";
+    }
+
+    private String taskToString (Task task) {
+        String epicId = task.getEpicId().toString();
+        if (epicId.equals("-1")) {
+            epicId = "";
+        }
+        return task.getId() + "," +task.getType() + "," + task.getName() + "," + task.getStatus() + ","
+                + task.getDescription() + "," + epicId + "\n";
+
     }
 
     private String historyToString() {
@@ -98,10 +92,8 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
         }
         for (int i = 1; i < lines.length; i++) {
             String[] items = lines[i].split(",");
-            if (lines[i].isBlank())  {
-                if (i != lines.length-1) {
-                    manager.historyManager.getHistory().addAll(historyFromString(lines[i+1], manager));
-                }
+            if (lines[i].isBlank() && i!=lines.length -1)  {
+                manager.historyManager.getHistory().addAll(historyFromString(lines[i+1], manager));
                 break;
             }
             fromString(items, manager);
@@ -165,17 +157,23 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
 
     @Override
     public ArrayList<Task> getTasks() {
-        return super.getTasks();
+        ArrayList<Task> list = super.getTasks();
+        save();
+        return list;
     }
 
     @Override
     public ArrayList<Epic> getEpics() {
-        return super.getEpics();
+        ArrayList<Epic> list = super.getEpics();
+        save();
+        return list;
     }
 
     @Override
     public ArrayList<Subtask> getSubtasks() {
-        return super.getSubtasks();
+        ArrayList<Subtask> list = super.getSubtasks();
+        save();
+        return list;
     }
 
     @Override
@@ -243,7 +241,9 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
 
     @Override
     public ArrayList<Subtask> getSubtaskForEpic(Epic epic) {
-        return super.getSubtaskForEpic(epic);
+        ArrayList<Subtask> list = super.getSubtaskForEpic(epic);
+        save();
+        return list;
     }
 
     @Override
@@ -284,6 +284,12 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
 
 class ManagerSaveException extends RuntimeException {
     public ManagerSaveException (String message) {
+        super(message);
+    }
+}
+
+class FileCreationException extends RuntimeException {
+    public FileCreationException (String message) {
         super(message);
     }
 }
