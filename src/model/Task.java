@@ -2,17 +2,48 @@ package model;
 
 import service.StatusManager;
 
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Task {
+
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yy|HH:mm:ss");
     protected int id;
     protected String name;
     protected String description;
     protected  String status;
 
-    public Task(String name, String description) {
+    protected LocalDateTime startTime;
+
+    protected LocalDateTime endTime;
+
+    protected long duration;
+
+
+    public Task(String name, String description, LocalDateTime startTime, long duration) {
        this.name = name;
        this.description = description;
+       this.startTime = startTime;
+       this.duration = duration;
+    }
+
+    public Task(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public Task(int id, String name, String status, String description, LocalDateTime startTime, long duration) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+        this.description = description;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
     public Task(int id, String name, String status, String description) {
@@ -20,6 +51,30 @@ public class Task {
         this.name = name;
         this.status = status;
         this.description = description;
+    }
+
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public void setDuration(long duration) {
+        this.duration = duration;
+    }
+
+    public long getDuration() {
+        return duration;
     }
 
     public void setStatus(StatusManager.Statuses id) {
@@ -55,11 +110,26 @@ public class Task {
 
     @Override
     public String toString() {
+        String startTimeString = "";
+        if (startTime == null) startTimeString = "none";
+        else startTimeString = startTime.toString();
         return "Task{" +
                 "taskName='" + name + '\'' +
                 ", taskDescription='" + description + '\'' +
-                ", status='" + status + '\'' +
+                ", status='" + status + '\'' + ", startTime='" + startTimeString  +'\'' +
                "}\n";
+    }
+
+    public String getInfoWithLocalData() {
+        return getId() + "," + getType() + "," + getName() + "," + getStatus() + ","
+                + getDescription() + "," + getDuration() + ","
+                + getStartTime().format(DATE_TIME_FORMATTER) + "," + getEndTime().format(DATE_TIME_FORMATTER) + ","
+                + getStringEpicId() +"\n";
+    }
+
+    public String getInfoWithoutLocalData() {
+        return getId() + "," + getType() + "," + getName() + "," + getStatus() + ","
+                + getDescription() + "," + getStringEpicId() + "\n";
     }
 
     @Override
@@ -73,6 +143,19 @@ public class Task {
                 && Objects.equals(status, task.status);
     }
 
+    public long getInstantStartTime() {
+        if (startTime != null)
+            return ZonedDateTime.of(startTime, ZoneId.of("Europe/Moscow")).toEpochSecond();
+        else
+            return 0L;
+    }
+
+    public long getInstantEndTime() {
+        if (startTime != null)
+            return ZonedDateTime.of(endTime, ZoneId.of("Europe/Moscow")).toEpochSecond();
+        else
+            return 0L;
+    }
     @Override
     public int hashCode() {
         return Objects.hash(name, description, id, status);
@@ -82,7 +165,12 @@ public class Task {
         return -1;
     }
 
+    public String getStringEpicId() {
+        return "";
+    }
     public String getType () {
         return "TASK";
     }
+
+
 }
