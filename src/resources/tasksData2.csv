@@ -1,3 +1,3 @@
-id,type,name,status,description,epic
-1,TASK,Поиграть,NEW,КС,
+id,type,name,status,description,duration,startTime,endTime,epic
+1,TASK,Поиграть,NEW,КС,120,12.01.23|13:22:00,12.01.23|15:22:00,
 
