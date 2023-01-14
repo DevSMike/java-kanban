@@ -1,43 +1,113 @@
 package service;
+import com.sun.source.tree.Tree;
 import model.Epic;
 import model.Task;
 import model.Subtask;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.lang.reflect.Array;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
 
+    protected static final DateTimeFormatter DATE_TIME_FORMATTER = Task.DATE_TIME_FORMATTER;
+
     protected  HashMap<Integer, Task> tasks = new HashMap<>();
+
     protected  HashMap<Integer, Epic> epics = new HashMap<>();
+
     protected  HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
+    protected  TreeSet<Task> sortedTasks;
+
     protected  HistoryManager historyManager = Managers.getDefaultHistory();
+
     protected int nextId = 1;
 
+    // доп. задание
+    protected void validateLocalDataInTasks(Task checkTask) {
+        sortedTasks = getPrioritizedTasks();
+        for (Task task : sortedTasks) {
+            if (checkTask.getInstantStartTime() >= task.getInstantStartTime()
+                    && checkTask.getInstantEndTime() <= task.getInstantEndTime() && checkTask.getStartTime() != null) {
+                throw new TaskCreationException("Задача:" + checkTask + " попадает в занятый интервал");
+            }
+        }
+    }
+
+    protected void calculateEpicTime(Epic epic) {
+        int epicDuration = 0;
+        LocalDateTime minStartTime = LocalDateTime.now();
+        LocalDateTime maxEndTime = LocalDateTime.now();
+        for (int id: epic.getSubtaskIds()) {
+            Subtask subtask = subtasks.get(id);
+            if (id == epic.getSubtaskIds().get(0)) {
+                minStartTime = subtask.getStartTime();
+                maxEndTime = subtask.getEndTime();
+            }
+            epicDuration += subtask.getDuration();
+            if (subtask.getStartTime().isBefore(minStartTime))
+                minStartTime = subtask.getStartTime();
+            if (subtask.getEndTime().isAfter(maxEndTime))
+                maxEndTime = subtask.getEndTime();
+        }
+        epic.setStartTime(minStartTime);
+        epic.setEndTime(maxEndTime);
+        epic.setDuration(epicDuration);
+    }
+
+    private boolean tryToCreateTask(Task task) {
+        try {
+            validateLocalDataInTasks(task);
+        } catch (TaskCreationException e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    private void setEndTime (Task task) {
+        if (task.getStartTime() != null)
+            task.setEndTime(task.getStartTime().plusMinutes(task.getDuration()));
+    }
     @Override
     public void addNewTaskItem(Task task) {
+        setEndTime(task);
+        if (!tryToCreateTask(task)) {
+            return;
+        }
         task.setId(nextId++);
         task.setStatus(StatusManager.Statuses.NEW);
+
         tasks.put(task.getId(), task);
     }
 
+
     @Override
     public void addNewEpicItem(Epic epic) {
+        if (!tryToCreateTask(epic)) {
+            return;
+        }
         epic.setId(nextId++);
         epics.put(epic.getId(), epic);
-        updateEpicStatus(epic);
+        updateEpicInfo(epic);
     }
+
 
     @Override
     public void addNewSubtaskItem(Subtask subtask) {
+        setEndTime(subtask);
+        if (!tryToCreateTask(subtask)) {
+            return;
+        }
         subtask.setId(nextId++);
         subtask.setStatus(StatusManager.Statuses.NEW);
+
         subtasks.put(subtask.getId(), subtask);
         Epic epic = epics.get(subtask.getEpicId());
         epic.setSubtaskIds(subtask.getId());
-        updateEpicStatus(epic);
+        updateEpicInfo(epic);
     }
 
     @Override
@@ -91,7 +161,7 @@ public class InMemoryTaskManager implements TaskManager {
         return  subtasks.get(id);
     }
     @Override
-    public void updateEpicStatus(Epic epic) {
+    public void updateEpicInfo(Epic epic) {
         boolean isNewStatus = false;
         int newCount = 0;
         boolean isDoneStatus = false;
@@ -106,6 +176,8 @@ public class InMemoryTaskManager implements TaskManager {
         } else if (doneCount == epic.getSubtaskIds().size()) {
             epic.setStatus(StatusManager.Statuses.DONE);
         } else { epic.setStatus(StatusManager.Statuses.IN_PROGRESS); }
+
+        calculateEpicTime(epic);
     }
 
     @Override
@@ -128,7 +200,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(subtasks.get(id).getEpicId());
         subtasks.remove(id);
         historyManager.remove(id);
-        updateEpicStatus(epic);
+        updateEpicInfo(epic);
     }
 
     @Override
@@ -164,7 +236,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         subtasks.put(subtask.getId(), subtask);
-        updateEpicStatus(epics.get(subtask.getEpicId()));
+        updateEpicInfo(epics.get(subtask.getEpicId()));
     }
 
     @Override
@@ -176,11 +248,39 @@ public class InMemoryTaskManager implements TaskManager {
     public void setSubtaskStatus(StatusManager.Statuses status, Subtask subtask) {
         subtasks.get(subtask.getId()).setStatus(status);;
         Epic epic = epics.get(subtask.getEpicId());
-        updateEpicStatus(epic);
+        updateEpicInfo(epic);
     }
 
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
+    }
+
+    @Override
+    public TreeSet<Task> getPrioritizedTasks() {
+        sortedTasks = new TreeSet<>((o1, o2) -> {
+            Optional<LocalDateTime> firstStart = Optional.ofNullable(o1.getStartTime());
+            Optional<LocalDateTime> secondStart = Optional.ofNullable(o2.getStartTime());
+                if (firstStart.orElse(LocalDateTime.MAX).isAfter(secondStart.orElse(LocalDateTime.MAX)))
+                    return 1;
+                else if (firstStart.orElse(LocalDateTime.MAX).isBefore(secondStart.orElse(LocalDateTime.MAX)))
+                    return -1;
+                else if (firstStart.orElse(LocalDateTime.MAX).isEqual(secondStart.orElse(LocalDateTime.MAX)))
+                    return 1;
+                else return 0;
+
+        });
+
+        sortedTasks.addAll(tasks.values());
+        sortedTasks.addAll(epics.values());
+        sortedTasks.addAll(subtasks.values());
+
+        return sortedTasks;
+    }
+}
+
+class TaskCreationException extends RuntimeException {
+    public TaskCreationException  (String message) {
+        super(message);
     }
 }
