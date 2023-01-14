@@ -20,6 +20,8 @@ public class Subtask extends Task {
         super(id, name, status, description);
         this.epicId = epicId;
     }
+
+
     @Override
     public Integer getEpicId() {
         return epicId;
