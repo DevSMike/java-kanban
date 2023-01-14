@@ -1,4 +1,5 @@
 package model;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -11,7 +12,7 @@ public class Epic extends Task {
     }
 
     public Epic (int id, String name, String status, String description) {
-        super(id, name, status, description);
+        super(id, name,status, description);
     }
 
     public void setSubtaskIds(int itemId) {
@@ -50,14 +51,18 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
+        String startTimeString = "";
+        if (startTime == null) startTimeString = "none";
+        else startTimeString = startTime.toString();
         return "Epic{" +
                 "subtaskIds=" + subtaskIds +
                 ", id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", status='" + status + '\'' +
+                ", status='" + status + '\''  +  ", startTime='" + startTimeString  +'\'' +
                 "}\n";
     }
+
 
     @Override
     public String getType () {
