@@ -1,35 +1,49 @@
 package model;
 
+import java.time.LocalDateTime;
+
 public class Subtask extends Task {
 
     protected int epicId;
 
-    public Subtask(String taskName, String taskDescription) {
-        super(taskName, taskDescription);
-    }
-
-    public Subtask (int id, String name, String status, String description, int epicId) {
-        super(id, name, status, description);
+    public Subtask (int id, String name, String status, String description, LocalDateTime startTime
+            ,long duration, int epicId) {
+        super(id, name, status, description, startTime, duration);
         this.epicId = epicId;
     }
 
+    public Subtask(String taskName, String taskDescription, LocalDateTime startTime, long duration) {
+        super(taskName, taskDescription, startTime, duration);
+    }
+
+    public Subtask (int id, String name, String description,String status, int epicId) {
+        super(id, name, status, description);
+        this.epicId = epicId;
+    }
     @Override
     public Integer getEpicId() {
         return epicId;
     }
-
+    @Override
+    public String getStringEpicId() {
+        return new Integer(epicId).toString();
+    }
     public void setEpicId(int epicId) {
         this.epicId = epicId;
     }
 
     @Override
     public String toString() {
+        String startTimeString = "";
+        if (startTime == null) startTimeString = "none";
+        else startTimeString = startTime.toString();
+
         return "Subtask{" +
                 "epicId=" + epicId +
                 ", id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", status='" + status + '\'' +
+                ", status='" + status + '\'' + ", startTime='" + startTimeString  +'\'' +
                 "}\n";
     }
 
