@@ -1,10 +1,9 @@
 package service;
-import com.sun.source.tree.Tree;
+import exception.MethodExecutionException;
 import model.Epic;
 import model.Task;
 import model.Subtask;
 
-import java.lang.reflect.Array;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -112,17 +111,23 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public ArrayList<Task> getTasks() {
-        return new ArrayList<>(tasks.values());
+        if (tasks.size() != 0)
+            return new ArrayList<>(tasks.values());
+        else throw new MethodExecutionException("Ошибка выполнения метода getTasks");
     }
 
     @Override
     public ArrayList<Epic> getEpics() {
-        return new ArrayList<>(epics.values());
+        if (epics.size() != 0)
+            return new ArrayList<>(epics.values());
+        else throw new MethodExecutionException("Ошибка выполнения метода getEpics");
     }
 
     @Override
     public ArrayList<Subtask> getSubtasks() {
-        return new ArrayList<Subtask>(subtasks.values());
+        if (subtasks.size() != 0)
+            return new ArrayList<>(subtasks.values());
+        else throw new MethodExecutionException("Ошибка выполнения метода getSubtasks");
     }
 
     @Override
@@ -145,23 +150,34 @@ public class InMemoryTaskManager implements TaskManager {
     }
     @Override
     public Task getTaskById(int id) {
+        if (tasks.size() == 0)
+            throw new MethodExecutionException("Невозможно получить task by id");
         historyManager.add(tasks.get(id));
         return tasks.get(id);
     }
 
     @Override
     public Epic getEpicById(int id) {
+        if (epics.size() == 0)
+            throw new MethodExecutionException("Невозможно получить epic by id");
         historyManager.add(epics.get(id));
         return epics.get(id);
     }
 
     @Override
     public Subtask getSubtaskById(int id) {
+        if (subtasks.size() == 0)
+            throw new MethodExecutionException("Невозможно получить subtask by id");
         historyManager.add(subtasks.get(id));
         return  subtasks.get(id);
     }
     @Override
     public void updateEpicInfo(Epic epic) {
+
+        if (epic.getSubtaskIds().size() == 0)  {
+            epic.setStatus(StatusManager.Statuses.NONE);
+            return;
+        }
         boolean isNewStatus = false;
         int newCount = 0;
         boolean isDoneStatus = false;
@@ -171,6 +187,7 @@ public class InMemoryTaskManager implements TaskManager {
             if (isNewStatus = subtask.getStatus() == StatusManager.Statuses.NEW) { newCount++; }
             if (isDoneStatus = subtask.getStatus() == StatusManager.Statuses.DONE) { doneCount++; }
         }
+
         if (newCount == epic.getSubtaskIds().size()) {
             epic.setStatus(StatusManager.Statuses.NEW);
         } else if (doneCount == epic.getSubtaskIds().size()) {
@@ -182,24 +199,32 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTaskById(int id) {
+        if (tasks.size() == 0)
+            throw new MethodExecutionException("Невозможно удалить task by id");
         tasks.remove(id);
         historyManager.remove(id);
     }
 
     @Override
     public void deleteEpicById(int id) {
+        if (epics.size() == 0)
+            throw new MethodExecutionException("Невозможно удалить epic by id");
         for (int ids : epics.get(id).getSubtaskIds()) {
             subtasks.remove(ids);
         }
         epics.remove(id);
-        historyManager.remove(id);
+        if (historyManager.isContainsId(id))
+             historyManager.remove(id);
     }
 
     @Override
     public void deleteSubtaskById(int id) {
+        if (subtasks.size() == 0)
+            throw new MethodExecutionException("Невозможно удалить subtask by id");
         Epic epic = epics.get(subtasks.get(id).getEpicId());
         subtasks.remove(id);
-        historyManager.remove(id);
+        if (historyManager.isContainsId(id))
+            historyManager.remove(id);
         updateEpicInfo(epic);
     }
 
@@ -219,6 +244,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (!tasks.containsKey(task.getId())) {
            return;
         }
+        if (!tryToCreateTask(task))
+            return;
         tasks.put(task.getId(), task);
     }
 
@@ -227,6 +254,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (!epics.containsKey(epic.getId())) {
             return;
         }
+        if (!tryToCreateTask(epic))
+            return;
         epics.put(epic.getId(), epic);
     }
 
@@ -235,6 +264,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (!subtasks.containsKey(subtask.getId()) && !epics.containsKey(subtask.getEpicId())) {
             return;
         }
+        if (!tryToCreateTask(subtask))
+            return;
         subtasks.put(subtask.getId(), subtask);
         updateEpicInfo(epics.get(subtask.getEpicId()));
     }
@@ -284,3 +315,4 @@ class TaskCreationException extends RuntimeException {
         super(message);
     }
 }
+
