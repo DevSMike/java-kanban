@@ -17,6 +17,11 @@ public class InMemoryHistoryManager implements  HistoryManager  {
     }
 
     @Override
+    public boolean isContainsId(int id) {
+        return uniqueTasks.containsKey(id);
+    }
+
+    @Override
     public void add(Task task) {
         if (task == null) {
             return;
