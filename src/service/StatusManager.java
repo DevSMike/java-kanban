@@ -4,7 +4,9 @@ public class StatusManager {
     public enum Statuses {
         NEW,
         IN_PROGRESS,
-        DONE
+        DONE,
+        NONE
+
     }
     public static String getStatusStringById(Statuses status) {
         return status.name();
