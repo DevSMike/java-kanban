@@ -1,5 +1,6 @@
 package model;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class Subtask extends Task {
@@ -7,12 +8,12 @@ public class Subtask extends Task {
     protected int epicId;
 
     public Subtask (int id, String name, String status, String description, LocalDateTime startTime
-            ,long duration, int epicId) {
+            , Duration duration, int epicId) {
         super(id, name, status, description, startTime, duration);
         this.epicId = epicId;
     }
 
-    public Subtask(String taskName, String taskDescription, LocalDateTime startTime, long duration) {
+    public Subtask(String taskName, String taskDescription, LocalDateTime startTime, Duration duration) {
         super(taskName, taskDescription, startTime, duration);
     }
 
@@ -28,7 +29,7 @@ public class Subtask extends Task {
     }
     @Override
     public String getStringEpicId() {
-        return new Integer(epicId).toString();
+        return Integer.valueOf(epicId).toString();
     }
     public void setEpicId(int epicId) {
         this.epicId = epicId;
