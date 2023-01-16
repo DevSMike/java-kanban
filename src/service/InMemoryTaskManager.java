@@ -1,5 +1,6 @@
 package service;
 import exception.MethodExecutionException;
+import exception.TaskCreationException;
 import model.Epic;
 import model.Task;
 import model.Subtask;
@@ -24,9 +25,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     protected int nextId = 1;
 
-    // доп. задание
+
     protected void validateLocalDataInTasks(Task checkTask) {
-        sortedTasks = getPrioritizedTasks();
+        try {
+            sortedTasks = getPrioritizedTasks();
+        } catch (MethodExecutionException e) {
+            return;
+        }
         for (Task task : sortedTasks) {
             if (checkTask.getInstantStartTime() >= task.getInstantStartTime()
                     && checkTask.getInstantEndTime() <= task.getInstantEndTime() && checkTask.getStartTime() != null) {
@@ -35,8 +40,9 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+
     protected void calculateEpicTime(Epic epic) {
-        int epicDuration = 0;
+        long epicDuration = 0;
         LocalDateTime minStartTime = LocalDateTime.now();
         LocalDateTime maxEndTime = LocalDateTime.now();
         for (int id: epic.getSubtaskIds()) {
@@ -45,7 +51,7 @@ public class InMemoryTaskManager implements TaskManager {
                 minStartTime = subtask.getStartTime();
                 maxEndTime = subtask.getEndTime();
             }
-            epicDuration += subtask.getDuration();
+            epicDuration += Duration.ofMinutes(subtask.getDuration().toMinutes()).toMinutes();
             if (subtask.getStartTime().isBefore(minStartTime))
                 minStartTime = subtask.getStartTime();
             if (subtask.getEndTime().isAfter(maxEndTime))
@@ -53,7 +59,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         epic.setStartTime(minStartTime);
         epic.setEndTime(maxEndTime);
-        epic.setDuration(epicDuration);
+        epic.setDuration(Duration.ofMinutes(epicDuration));
     }
 
     private boolean tryToCreateTask(Task task) {
@@ -68,8 +74,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     private void setEndTime (Task task) {
         if (task.getStartTime() != null)
-            task.setEndTime(task.getStartTime().plusMinutes(task.getDuration()));
+            task.setEndTime(task.getStartTime().plusMinutes(task.getDuration().toMinutes()));
     }
+
     @Override
     public void addNewTaskItem(Task task) {
         setEndTime(task);
@@ -82,7 +89,6 @@ public class InMemoryTaskManager implements TaskManager {
         tasks.put(task.getId(), task);
     }
 
-
     @Override
     public void addNewEpicItem(Epic epic) {
         if (!tryToCreateTask(epic)) {
@@ -92,7 +98,6 @@ public class InMemoryTaskManager implements TaskManager {
         epics.put(epic.getId(), epic);
         updateEpicInfo(epic);
     }
-
 
     @Override
     public void addNewSubtaskItem(Subtask subtask) {
@@ -182,8 +187,13 @@ public class InMemoryTaskManager implements TaskManager {
         int newCount = 0;
         boolean isDoneStatus = false;
         int doneCount = 0;
+        if (epic.getSubtaskIds().size() == 0)
+            return;
         for (int itemId : epic.getSubtaskIds()) {
             Subtask subtask = subtasks.get(itemId);
+            if (subtask == null) {
+                throw new MethodExecutionException("Subtask у Epic равен null");
+            }
             if (isNewStatus = subtask.getStatus() == StatusManager.Statuses.NEW) { newCount++; }
             if (isDoneStatus = subtask.getStatus() == StatusManager.Statuses.DONE) { doneCount++; }
         }
@@ -222,6 +232,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtasks.size() == 0)
             throw new MethodExecutionException("Невозможно удалить subtask by id");
         Epic epic = epics.get(subtasks.get(id).getEpicId());
+        epic.deleteSubtaskIdInList(subtasks.get(id).getId());
         subtasks.remove(id);
         if (historyManager.isContainsId(id))
             historyManager.remove(id);
@@ -230,6 +241,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public ArrayList<Subtask> getSubtaskForEpic(Epic epic) {
+        if (epic.getSubtaskIds().size() == 0)
+            throw new MethodExecutionException("У данного эпика: " + epic + " нет сабтасков");
         ArrayList<Subtask> subtaskForEpic = new ArrayList<>();
         for (Subtask subtask : subtasks.values()) {
             if (subtask.getEpicId() == epic.getId()) {
@@ -244,8 +257,12 @@ public class InMemoryTaskManager implements TaskManager {
         if (!tasks.containsKey(task.getId())) {
            return;
         }
+        if (task.getEndTime() == null && task.getStartTime() != null)
+            setEndTime(task);
         if (!tryToCreateTask(task))
             return;
+        if (task.getStatus() == null)
+            task.setStatus(StatusManager.Statuses.NEW);
         tasks.put(task.getId(), task);
     }
 
@@ -254,9 +271,12 @@ public class InMemoryTaskManager implements TaskManager {
         if (!epics.containsKey(epic.getId())) {
             return;
         }
+        if (epic.getEndTime() == null && epic.getStartTime() != null)
+            setEndTime(epic);
         if (!tryToCreateTask(epic))
             return;
         epics.put(epic.getId(), epic);
+        updateEpicInfo(epic);
     }
 
     @Override
@@ -264,19 +284,28 @@ public class InMemoryTaskManager implements TaskManager {
         if (!subtasks.containsKey(subtask.getId()) && !epics.containsKey(subtask.getEpicId())) {
             return;
         }
+        subtask.setEpicId(subtasks.get(subtask.getId()).getEpicId());
+        if (subtask.getEndTime() == null && subtask.getStartTime() != null)
+            setEndTime(subtask);
         if (!tryToCreateTask(subtask))
             return;
+        if ( subtask.getStatus() == null )
+            subtask.setStatus(StatusManager.Statuses.NEW);
         subtasks.put(subtask.getId(), subtask);
         updateEpicInfo(epics.get(subtask.getEpicId()));
     }
 
     @Override
     public void setTaskStatus(StatusManager.Statuses status, Task task) {
+          if (tasks.size() == 0)
+            throw new MethodExecutionException("Невозможно задать статус таску");
         tasks.get(task.getId()).setStatus(status);
     }
 
     @Override
     public void setSubtaskStatus(StatusManager.Statuses status, Subtask subtask) {
+        if (subtasks.size() == 0)
+            throw new MethodExecutionException("Невозможно задать статус сабтаску");
         subtasks.get(subtask.getId()).setStatus(status);;
         Epic epic = epics.get(subtask.getEpicId());
         updateEpicInfo(epic);
@@ -284,11 +313,15 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getHistory() {
+        if (historyManager.getHistory().size() == 0)
+            throw new MethodExecutionException("Ошибка в выводе истории просмотра");
         return historyManager.getHistory();
     }
 
     @Override
     public TreeSet<Task> getPrioritizedTasks() {
+        if (tasks.size() == 0 && subtasks.size() == 0 && epics.size() == 0)
+            throw new MethodExecutionException("Ошибка в выводе приоритета задач");
         sortedTasks = new TreeSet<>((o1, o2) -> {
             Optional<LocalDateTime> firstStart = Optional.ofNullable(o1.getStartTime());
             Optional<LocalDateTime> secondStart = Optional.ofNullable(o2.getStartTime());
@@ -307,12 +340,6 @@ public class InMemoryTaskManager implements TaskManager {
         sortedTasks.addAll(subtasks.values());
 
         return sortedTasks;
-    }
-}
-
-class TaskCreationException extends RuntimeException {
-    public TaskCreationException  (String message) {
-        super(message);
     }
 }
 
