@@ -35,6 +35,16 @@ public class Epic extends Task {
         subtaskIds.clear();
     }
 
+    public void deleteSubtaskIdInList(int id) {
+        for (int i = 0; i < subtaskIds.size(); i++) {
+            if (subtaskIds.get(i) == id) {
+                subtaskIds.remove(i);
+                return;
+            }
+        }
+
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
