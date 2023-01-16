@@ -6,6 +6,7 @@ import service.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Month;
 
@@ -20,33 +21,33 @@ public class MainForFiles {
 
         TaskManager taskManager = Managers.getDefault();
 
-        Main.printAllTasksInfo(taskManager);
-        Printer.printTaskHistory(taskManager.getHistory());
+//        Main.printAllTasksInfo(taskManager);
+     //   Printer.printTaskHistory(taskManager.getHistory());
 
         Task taskN1 = new Task("Прогулка", "Сходить в лес",
-                LocalDateTime.of(2023, Month.JANUARY, 16, 21, 22), 200);
+                LocalDateTime.of(2023, Month.JANUARY, 16, 21, 22), Duration.ofMinutes(100));
         //вылетает
         Task taskN2 = new Task("Почитать", "Чтение перед сном"
-                ,LocalDateTime.of(2023, Month.JANUARY, 17, 21, 22), 100);
+                ,LocalDateTime.of(2023, Month.JANUARY, 17, 21, 22), Duration.ofMinutes(10));
         taskManager.addNewTaskItem(taskN1);
         taskManager.addNewTaskItem(taskN2);
 
         Epic epicN1 = new Epic("Купить подарки на НГ", "Составить список");
 
         Subtask subtaskEpicN1N1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
-                ,LocalDateTime.of(2023, Month.JANUARY, 11, 21, 22), 500);
+                ,LocalDateTime.of(2023, Month.JANUARY, 11, 21, 22), Duration.ofMinutes(11));
 
         Subtask subtaskEpicN1N2 = new Subtask("Купить ленточку","Заказать на Яндекс Маркете"
-                ,LocalDateTime.of(2023, Month.JANUARY, 8, 21, 22),10);
+                ,LocalDateTime.of(2023, Month.JANUARY, 8, 21, 22),Duration.ofMinutes(200));
 
         Subtask subtaskEpicN1N3 = new Subtask("Купить упаковку","Заказать на Яндекс Маркете"
-                ,LocalDateTime.of(2023, Month.JANUARY, 7, 19, 25),15);
+                ,LocalDateTime.of(2023, Month.JANUARY, 7, 19, 25),Duration.ofMinutes(15));
 
         Subtask subtaskEpicN1N4 = new Subtask("Купить бантик","Заказать на Яндекс Маркете"
-                ,LocalDateTime.of(2023, Month.JANUARY, 15, 21, 22),22);
+                ,LocalDateTime.of(2023, Month.JANUARY, 15, 21, 22),Duration.ofMinutes(22));
 
         Subtask subtaskEpicN1N5 = new Subtask("Купить Попить","Заказать на Яндекс Маркете"
-                ,LocalDateTime.of(2023, Month.JANUARY, 8, 21, 22), 50);
+                ,LocalDateTime.of(2023, Month.JANUARY, 8, 21, 22), Duration.ofMinutes(50));
         taskManager.addNewEpicItem(epicN1);
         subtaskEpicN1N1.setEpicId(epicN1.getId());
         subtaskEpicN1N2.setEpicId(epicN1.getId());
@@ -93,7 +94,7 @@ public class MainForFiles {
          FileBackedTasksManager  newFb = FileBackedTasksManager.loadFromFile(file);
 
         Task task3 = new Task("Отдых", "Украсить ёлку"
-                ,LocalDateTime.of(2023, Month.JANUARY, 17, 21, 22), 20000);
+                ,LocalDateTime.of(2023, Month.JANUARY, 17, 21, 22), Duration.ofMinutes(2000));
         newFb.addNewTaskItem(task3);
         Main.printAllTasksInfo(newFb);
         Printer.printTaskHistory(newFb.getHistory());
@@ -101,7 +102,7 @@ public class MainForFiles {
         System.out.println("\n Третий файл менеджер");
         FileBackedTasksManager tempFb = new FileBackedTasksManager(file2);
         Task taskN3 = new Task("Поиграть", "КС"
-                ,LocalDateTime.of(2023, Month.JANUARY, 12, 13, 22), 120);
+                ,LocalDateTime.of(2023, Month.JANUARY, 12, 13, 22), Duration.ofMinutes(1000));
         tempFb.addNewTaskItem(taskN3);
         System.out.println(tempFb.getTasks());
 
