@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
     private static final int ELEMENTS_IN_TASK_WITH_TIME = 5;
 
     private  static final int ELEMENTS_IN_SUBTASK_WITH_TIME = 6;
+
     private final  File taskData;
 
     public FileBackedTasksManager(File file)  {
@@ -60,11 +62,6 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
     }
 
     private String taskToString (Task task) {
-        String epicId = task.getEpicId().toString();
-        if (epicId.equals("-1")) {
-            epicId = "";
-        }
-
         if (task.getStartTime() == null) {
             return task.getInfoWithoutLocalData();
         }
@@ -94,11 +91,11 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
         FileBackedTasksManager manager = new FileBackedTasksManager(file);
         String data = readDataFromFile(file);
         if (data == null) {
-            throw new IOException();
+            throw new IOException("Данных в файле нет");
         }
         String[] lines = data.split("\\n");
         if (lines.length <= 1) {
-            throw new IOException();
+            throw new IOException("Данных в файле нет");
         }
         for (int i = 1; i < lines.length; i++) {
             String[] items = lines[i].split(",");
@@ -152,7 +149,8 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
         if (params.length > ELEMENTS_IN_TASK_WITH_TIME) {
             task = new Task(Integer.parseInt(params[0]), params[2], params[3], params[4]
                     , LocalDateTime.parse(params[6], DATE_TIME_FORMATTER)
-                    , Long.parseLong(params[5]));
+                    , Duration.parse(params[5]));
+
         } else {
             task = new Task(Integer.parseInt(params[0]), params[2], params[3], params[4]);
         }
@@ -164,7 +162,7 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
           if (params.length > ELEMENTS_IN_SUBTASK_WITH_TIME) {
               subtask = new Subtask(Integer.parseInt(params[0]), params[2], params[3], params[4]
                       ,LocalDateTime.parse(params[6], DATE_TIME_FORMATTER)
-                      ,Long.parseLong(params[5]),Integer.parseInt(params[8].trim()));
+                      ,Duration.parse(params[5]),Integer.parseInt(params[8].trim()));
           } else {
               subtask = new Subtask(Integer.parseInt(params[0]), params[2], params[3], params[4]
                       ,Integer.parseInt(params[8].trim()));
