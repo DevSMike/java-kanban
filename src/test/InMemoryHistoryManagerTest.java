@@ -27,7 +27,7 @@ class InMemoryHistoryManagerTest {
     void getHistoryShouldBeEmptyIfEmptyHistory() {
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.getHistory()
         ,"Исключение не кидается");
-        assertEquals(e.getMessage(), "Ошибка в выводе истории просмотра", "ошибки не равны");
+        assertEquals(e.getMessage(), "Ошибка в выводе истории просмотра", "Ошибки не равны");
     }
 
     @Test
