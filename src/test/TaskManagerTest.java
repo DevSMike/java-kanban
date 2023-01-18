@@ -26,7 +26,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void addNewTaskItem() {
+    void addNewTaskItemShouldAddIfTaskIsNotNull() {
         Task task = new Task("Задача", "Нужно выполнить");
         taskManager.addNewTaskItem(task);
         Task testTask = taskManager.getTaskById(task.getId());
@@ -37,7 +37,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void addNewEpicItem() {
+    void addNewEpicItemShouldAddIfEpicIsNotNull() {
         Epic epic = new Epic("Задача", "Что делаем");
         taskManager.addNewEpicItem(epic);
         Epic testEpic = taskManager.getEpicById(epic.getId());
@@ -53,7 +53,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void addNewSubtaskItem() {
+    void addNewSubtaskItemShouldAddIfSubtaskIsNotNull() {
         Epic testEpic = new Epic("Задача", "Купить подарок на НГ");
         taskManager.addNewEpicItem(testEpic);
         Subtask testSubtask = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
@@ -66,12 +66,14 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertEquals(newSubtask.getEpicId(), testEpic.getId(), "Эпик Id сабтаска неверный");
     }
 
-    private void shouldBeExceptionWhileNoTasksInGetMethod() {
+    @Test
+    void getTasksShouldBeExceptionWhileNoTasks() {
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.getTasks());
         assertEquals(e.getMessage(),"Ошибка выполнения метода getTasks", "Ошибки не равны");
     }
 
-    private void shouldListOfTaskEqualsGetTasks() {
+    @Test
+    void getTasksShouldReturnTasks() {
         Task task = new Task("Задача", "Выполнить");
         Task task2 = new Task("Задача", "Выполнить");
         taskManager.addNewTaskItem(task);
@@ -83,17 +85,13 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void getTasks() {
-        shouldBeExceptionWhileNoTasksInGetMethod();
-        shouldListOfTaskEqualsGetTasks();
-    }
-
-    private void shouldBeExceptionWhileNoEpicsInGetMethod() {
+    void getEpicsShouldBeExceptionWhileNoEpics() {
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.getEpics());
         assertEquals(e.getMessage(),"Ошибка выполнения метода getEpics", "Ошибки не равны");
     }
 
-    private void shouldListOfEpicEqualsGetEpics() {
+    @Test
+    void getEpicsShouldReturnEpics() {
         Epic epic1 = new Epic("Задача", "Выполнить");
         Epic epic2 = new Epic("Задача", "Выполнить");
         taskManager.addNewEpicItem(epic1);
@@ -105,17 +103,13 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void getEpics() {
-        shouldBeExceptionWhileNoEpicsInGetMethod();
-        shouldListOfEpicEqualsGetEpics();
-    }
-
-    private void shouldBeExceptionWhileNoSubtasksInGetMethod() {
+    void getSubtasksShouldBeExceptionWhileNoSubtasks() {
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.getSubtasks());
         assertEquals(e.getMessage(),"Ошибка выполнения метода getSubtasks", "Ошибки не равны");
     }
 
-    private void shouldListOfSubtaskEqualsGetSubtask() {
+    @Test
+    void getSubtasksShouldReturnSubtasks() {
         Epic epic = new Epic("Задача", "Выполнить");
         taskManager.addNewEpicItem(epic);
         Subtask subtask1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
@@ -133,18 +127,14 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void getSubtasks() {
-        shouldBeExceptionWhileNoSubtasksInGetMethod();
-        shouldListOfSubtaskEqualsGetSubtask();
-    }
-
-    private void shouldBeExceptionWhileNoTasksWhenDeleteThem() {
+    void deleteTasksShouldBeExceptionWhileNoTasks() {
         taskManager.deleteTasks();
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.getTasks());
         assertEquals(e.getMessage(),"Ошибка выполнения метода getTasks", "Ошибки не равны");
     }
 
-    private void shouldDeleteAllTaskIfTasksAreExist() {
+    @Test
+    void deleteTasksShouldDeleteAllTasksIfExists() {
         Task task = new Task("", "");
         taskManager.addNewTaskItem(task);
         assertEquals(taskManager.getTasks().size(), 1, "Списков тасков неверный");
@@ -154,18 +144,14 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void deleteTasks() {
-        shouldBeExceptionWhileNoTasksWhenDeleteThem();
-        shouldDeleteAllTaskIfTasksAreExist();
-    }
-
-    private void shouldBeExceptionWhileNoEpicsWhenDeleteThem() {
+    void deleteEpicsShouldBeExceptionWhileNoEpics() {
         taskManager.deleteEpics();
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.getEpics());
         assertEquals(e.getMessage(),"Ошибка выполнения метода getEpics", "Ошибки не равны");
     }
 
-    private void shouldDeleteAllEpicsAndSubtasksForEpicsIfEpicsAreExist() {
+    @Test
+    void deleteEpicsShouldDeleteAllEpicsAndSubtasksIfExists() {
         Epic epic = new Epic("Задача", "Выполнить");
         taskManager.addNewEpicItem(epic);
         Subtask subtask1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
@@ -186,18 +172,14 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void deleteEpics() {
-        shouldBeExceptionWhileNoEpicsWhenDeleteThem();
-        shouldDeleteAllEpicsAndSubtasksForEpicsIfEpicsAreExist();
-    }
-
-    private void shouldBeExceptionWhileNoSubtasksWhenDeleteThem() {
+    void deleteSubtasksShouldBeExceptionWhileNoSubtasks() {
         taskManager.deleteSubtasks();
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.getSubtasks());
         assertEquals(e.getMessage(),"Ошибка выполнения метода getSubtasks", "Ошибки не равны");
     }
 
-    private void shouldDeleteAllSubtasksIfEpicsAndSubtasksAreExist() {
+    @Test
+    void deleteSubtasksShouldDeleteAllSubtasksIfEpicsAndSubtasksAreExist() {
         Epic epic = new Epic("Задача", "Выполнить");
         taskManager.addNewEpicItem(epic);
         Subtask subtask1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
@@ -217,17 +199,13 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void deleteSubtasks() {
-        shouldBeExceptionWhileNoSubtasksWhenDeleteThem();
-        shouldDeleteAllSubtasksIfEpicsAndSubtasksAreExist();
-    }
-
-    private void shouldBeExceptionWhenNoTasksInGetTaskById() {
+    void getTaskByIdShouldBeExceptionWhenNoTasks() {
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.getTaskById(0));
         assertEquals(e.getMessage(), "Невозможно получить task by id", "Ошибки не равны");
     }
 
-    private void shouldGetTaskByIdIfExistAndWriteInHistory() {
+    @Test
+    void getTaskByIdShouldReturnCorrectTaskAndAddInHistory() {
         Task task = new Task("", "");
         taskManager.addNewTaskItem(task);
         MethodExecutionException eh = assertThrows(MethodExecutionException.class, () -> taskManager.getHistory()
@@ -238,17 +216,13 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void getTaskById() {
-        shouldBeExceptionWhenNoTasksInGetTaskById();
-        shouldGetTaskByIdIfExistAndWriteInHistory();
-    }
-
-    private void shouldBeExceptionWhenNoEpicsInGetEpicById() {
+    void getEpicByIdShouldBeExceptionWhenNoEpics() {
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.getEpicById(0));
         assertEquals(e.getMessage(), "Невозможно получить epic by id", "Ошибки не равны");
     }
 
-    private void shouldGetEpicByIdIfExistAndWriteInHistory() {
+    @Test
+    void getEpicByIdShouldReturnCorrectEpicAndAddInHistory() {
         Epic epic = new Epic("", "");
         taskManager.addNewEpicItem(epic);
         MethodExecutionException eh = assertThrows(MethodExecutionException.class, () -> taskManager.getHistory()
@@ -259,17 +233,13 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void getEpicById() {
-        shouldBeExceptionWhenNoEpicsInGetEpicById();
-        shouldGetEpicByIdIfExistAndWriteInHistory();
-    }
-
-    private void shouldBeExceptionWhenNoSubtasksInGetSubtaskById() {
+    void getSubtaskByIdShouldBeExceptionWhenNoSubtasks() {
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.getSubtaskById(0));
         assertEquals(e.getMessage(),"Невозможно получить subtask by id", "Ошибки не равны");
     }
 
-    private void shouldGetSubtaskByIdIfExistAndWriteInHistory() {
+    @Test
+    void getSubtaskByIdShouldReturnCorrectSubtaskAndAddInHistory()  {
         Epic epic = new Epic("Задача", "Выполнить");
         taskManager.addNewEpicItem(epic);
         Subtask subtask1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
@@ -285,18 +255,14 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void getSubtaskById() {
-        shouldBeExceptionWhenNoSubtasksInGetSubtaskById();
-        shouldGetSubtaskByIdIfExistAndWriteInHistory();
-    }
-
-    private void shouldBeNoneWhenNoSubtasksInEpic() {
+    void updateEpicInfoShouldBeNoneWhenNoSubtasksInEpic() {
         Epic epic = new Epic("Купить подарки на НГ", "Составить список");
         taskManager.addNewEpicItem(epic);
         assertEquals(epic.getStatus(), StatusManager.Statuses.NONE, "Статусы не равны");
     }
 
-    private void shouldBeNewWhenAllSubtasksInEpicHaveNew() {
+    @Test
+    void updateEpicInfoShouldBeNewWhenAllSubtasksInEpicHaveNew() {
         Epic epicN1 = new Epic("Купить подарки на НГ", "Составить список");
         Subtask subtaskEpicN1N1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
                 ,LocalDateTime.of(2023, Month.JANUARY, 11, 21, 22),  Duration.ofMinutes(500));
@@ -311,7 +277,8 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertEquals(epicN1.getStatus(), StatusManager.Statuses.NEW, "Статусы не равны");
     }
 
-    private void shouldBeDoneWhenAllSubtasksInEpicHaveDone() {
+    @Test
+    void updateEpicInfoShouldBeDoneWhenAllSubtasksInEpicHaveDone() {
         Epic epicN3 = new Epic("Купить подарки на НГ", "Составить список");
         taskManager.addNewEpicItem(epicN3);
         Subtask subtaskEpicN3N1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
@@ -327,7 +294,8 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertEquals(epicN3.getStatus(), StatusManager.Statuses.DONE, "Статусы не равны");
     }
 
-    private void shouldBeInProgressWhenOneSubtaskInEpicNewAndDone() {
+    @Test
+    void updateEpicInfoShouldBeInProgressWhenOneSubtaskInEpicNewAndDone() {
         Epic epicN4 = new Epic("Купить подарки на НГ", "Составить список");
         taskManager.addNewEpicItem(epicN4);
         Subtask subtaskEpicN4N1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
@@ -343,7 +311,8 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertEquals(epicN4.getStatus(), StatusManager.Statuses.IN_PROGRESS, "Статусы не равны");
     }
 
-    private void shouldBeInProgressWhenAllSubtasksInEpicHaveInProgress() {
+    @Test
+    void updateEpicInfoShouldBeInProgressWhenAllSubtasksInEpicHaveInProgress() {
         Epic epicN5 = new Epic("Купить подарки на НГ", "Составить список");
         taskManager.addNewEpicItem(epicN5);
         Subtask subtaskEpicN5N1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
@@ -363,20 +332,13 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void updateEpicInfo() {
-        shouldBeNoneWhenNoSubtasksInEpic();
-        shouldBeNewWhenAllSubtasksInEpicHaveNew();
-        shouldBeDoneWhenAllSubtasksInEpicHaveDone();
-        shouldBeInProgressWhenOneSubtaskInEpicNewAndDone();
-        shouldBeInProgressWhenAllSubtasksInEpicHaveInProgress();
-    }
-
-    private void shouldBeExceptionWhenNoTaskInDeleteTaskById() {
+    void deleteTaskByIdShouldBeExceptionWhenNoTasks() {
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.deleteTaskById(0));
         assertEquals(e.getMessage(), "Невозможно удалить task by id", "Ошибки не равны");
     }
 
-    private void shouldDeleteTaskByIdAndDeleteFromHistoryIfExist() {
+    @Test
+    void deleteTaskByIdShouldDeleteTaskAndDeleteFromHistoryIfExist() {
         Task task = new Task("", "");
         taskManager.addNewTaskItem(task);
         taskManager.getTaskById(task.getId());
@@ -391,17 +353,13 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void deleteTaskById() {
-        shouldBeExceptionWhenNoTaskInDeleteTaskById();
-        shouldDeleteTaskByIdAndDeleteFromHistoryIfExist();
-    }
-
-    private void shouldBeExceptionWhenNoEpicInDeleteEpicById() {
+    void deleteEpicByIdShouldBeExceptionWhenNoEpics() {
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.deleteEpicById(0));
         assertEquals(e.getMessage(), "Невозможно удалить epic by id", "Ошибки не равны");
     }
 
-    private void shouldDeleteEpicByIdAndEpicSubtasksIfExit() {
+    @Test
+    void deleteEpicByIdShouldDeleteEpicAndItSubtasksAndDeleteFromHistoryIfExist() {
         Epic epic = new Epic("Задача", "Выполнить");
         taskManager.addNewEpicItem(epic);
         Subtask subtask1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
@@ -423,17 +381,13 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void deleteEpicById() {
-        shouldBeExceptionWhenNoEpicInDeleteEpicById();
-        shouldDeleteEpicByIdAndEpicSubtasksIfExit();
-    }
-
-    private void shouldBeExceptionWhenNoSubtaskInDeleteSubtaskById() {
+    void deleteSubtaskByIdShouldBeExceptionWhenNoSubtasks() {
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.deleteSubtaskById(0));
         assertEquals(e.getMessage(),"Невозможно удалить subtask by id", "Ошибки не равны");
     }
 
-    private void shouldBeCorrectEpicStatusAndSubtasksIdsSizeWhenDeleteSubtaskById() {
+    @Test
+    void deleteSubtaskByIdShouldDeleteSubtaskIfExistAndMakeCorrectEpicStatus() {
         Epic epic = new Epic("Задача", "Выполнить");
         taskManager.addNewEpicItem(epic);
         Subtask subtask1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
@@ -455,18 +409,14 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void deleteSubtaskById() {
-        shouldBeExceptionWhenNoSubtaskInDeleteSubtaskById();
-        shouldBeCorrectEpicStatusAndSubtasksIdsSizeWhenDeleteSubtaskById();
-    }
-
-    private void shouldBeExceptionWhenNoSubtaskForEpic() {
+    void getSubtasksForEpicShouldBeExceptionWhenNoSubtasksForEpic() {
         Epic epic = new Epic("","");
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.getSubtaskForEpic(epic));
         assertEquals(e.getMessage(), "У данного эпика: " + epic + " нет сабтасков", "Ошибки не равны");
     }
 
-    private void shouldBeListWithSubtaskIdsNotNullAndEqualsListOfSubtaskIds() {
+    @Test
+    void getSubtasksForEpicShouldReturnCorrectListOfNotNullSubtasksIfExists() {
         Epic epic = new Epic("Задача", "Выполнить");
         taskManager.addNewEpicItem(epic);
         Subtask subtask1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
@@ -485,18 +435,14 @@ abstract class TaskManagerTest <T extends TaskManager> {
      }
 
     @Test
-    void getSubtaskForEpic() {
-        shouldBeExceptionWhenNoSubtaskForEpic();
-        shouldBeListWithSubtaskIdsNotNullAndEqualsListOfSubtaskIds();
-    }
-
-    private void shouldNotUpdateTaskIfNotContains() {
+    void updateTaskShouldNotUpdateIfNotContains() {
         Task task = new Task("","");
         taskManager.updateTask(task);
         assertEquals(task.getId(), 0);
     }
 
-    private void shouldNotUpdateTaskIfDateCompareToSomeTask() {
+    @Test
+    void updateTaskShouldNotUpdateIfDateCompareToSomeTask() {
         Task taskN1 = new Task("Прогулка", "Сходить в лес",
                 LocalDateTime.of(2023, Month.JANUARY, 16, 21, 22),  Duration.ofMinutes(10));
         Task taskN2 = new Task("Почитать", "Чтение перед сном"
@@ -508,7 +454,8 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertEquals(testTask, taskN2);
     }
 
-    private void shouldUpdateTaskIfContainsAndNormalDate() {
+    @Test
+    void updateTaskShouldUpdateIfContainsAndNormalDate() {
         Task taskN1 = new Task("Прогулка", "Сходить в лес",
                 LocalDateTime.of(2023, Month.JANUARY, 16, 21, 22),  Duration.ofMinutes(200));
         Task taskN2 = new Task("Почитать", "Чтение перед сном"
@@ -521,19 +468,14 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void updateTask() {
-        shouldNotUpdateTaskIfNotContains();
-        shouldNotUpdateTaskIfDateCompareToSomeTask();
-        shouldUpdateTaskIfContainsAndNormalDate();
-    }
-
-    private void shouldNotUpdateEpicIfNotContains() {
+    void updateEpicShouldNotUpdateIfNotContains() {
         Epic epic = new Epic("","");
         taskManager.updateEpic(epic);
         assertEquals(epic.getId(), 0);
     }
 
-    private void shouldUpdateEpicIfContains() {
+    @Test
+    void updateEpicShouldUpdateIfContains() {
         Epic epic = new Epic("1"," а ");
         Epic epic2 = new Epic("2"," б ");
         taskManager.addNewEpicItem(epic);
@@ -548,19 +490,15 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void updateEpic() {
-        shouldNotUpdateEpicIfNotContains();
-        shouldUpdateEpicIfContains();
-    }
-
-    private void shouldNotUpdateSubtaskIfNotContainsAndNoEpicForThisSubtask() {
+    void updateSubtasksShouldNotUpdateIfNotContainsAndNoEpicForThisSubtask() {
         Subtask subtask1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
                 ,LocalDateTime.of(2023, Month.JANUARY, 19, 21, 22),  Duration.ofMinutes(500));
         taskManager.updateSubtask(subtask1);
         assertEquals(subtask1.getId(), 0);
     }
 
-    private void shouldUpdateSubtaskIfEpicAndDateAreNormalAndChangeEpicStatus() {
+    @Test
+    void updateSubtaskShouldUpdateAndChangeEpicStatusIfEpicAndDateAreNormal() {
         Task taskN1 = new Task("Прогулка", "Сходить в лес",
                 LocalDateTime.of(2023, Month.JANUARY, 22, 21, 22),  Duration.ofMinutes(10));
         taskManager.addNewTaskItem(taskN1);
@@ -580,7 +518,8 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertEquals(epic1.getStatus(), StatusManager.Statuses.IN_PROGRESS);
     }
 
-    private void shouldNotUpdateSubtaskIfDateCompareToSomeTask () {
+    @Test
+    void updateSubtaskShouldNotUpdateIfDateCompareToSomeTask () {
         Task taskN1 = new Task("Прогулка", "Сходить в лес",
                 LocalDateTime.of(2023, Month.JANUARY, 16, 21, 22),  Duration.ofMinutes(200));
         taskManager.addNewTaskItem(taskN1);
@@ -599,20 +538,15 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void updateSubtask() {
-        shouldNotUpdateSubtaskIfNotContainsAndNoEpicForThisSubtask();
-        shouldNotUpdateSubtaskIfDateCompareToSomeTask();
-        shouldUpdateSubtaskIfEpicAndDateAreNormalAndChangeEpicStatus();
-    }
-
-    private void shouldBeExceptionWhenSetTaskStatusToNotExistTask() {
+    void setTaskStatusShouldBeExceptionWhenNotExist() {
         Task task = new Task("", "");
         MethodExecutionException e = assertThrows(MethodExecutionException.class
                 , () -> taskManager.setTaskStatus(StatusManager.Statuses.NEW, task), "Исключение не выпадает");
         assertEquals(e.getMessage(), "Невозможно задать статус таску", "Ошибки не равны");
     }
 
-    private void shouldSetStatusWhenTaskIsExist() {
+    @Test
+     void setTaskStatusShouldSetStatusExist() {
         Task task = new Task(" ", " ");
         taskManager.addNewTaskItem(task);
         taskManager.setTaskStatus(StatusManager.Statuses.IN_PROGRESS, task);
@@ -620,12 +554,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void setTaskStatus() {
-        shouldBeExceptionWhenSetTaskStatusToNotExistTask();
-        shouldSetStatusWhenTaskIsExist();
-    }
-
-    private void shouldBeExceptionWhenSetSubtaskStatusToNotExistSubtask() {
+    void setSubtaskStatusShouldBeExceptionWhenNotExist() {
        Subtask subtask1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
                 ,LocalDateTime.of(2023, Month.JANUARY, 19, 21, 22),  Duration.ofMinutes(500));
         MethodExecutionException e = assertThrows(MethodExecutionException.class
@@ -633,7 +562,8 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertEquals(e.getMessage(), "Невозможно задать статус сабтаску", "Ошибки не равны");
     }
 
-    private void shouldSetSubtaskStatusAndChangeEpicStatusIfExist() {
+    @Test
+    void setSubtaskStatusShouldSetStatusAndChangeEpicsIsExist() {
         Epic epic = new Epic("Задача", "Выполнить");
         taskManager.addNewEpicItem(epic);
         Subtask subtask1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
@@ -648,18 +578,14 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void setSubtaskStatus() {
-        shouldBeExceptionWhenSetSubtaskStatusToNotExistSubtask();
-        shouldSetSubtaskStatusAndChangeEpicStatusIfExist();
-    }
-
-    private void shouldExceptionWhenHistoryIsEmpty() {
+    void getHistoryShouldBeExceptionWhenIsEmpty() {
         MethodExecutionException e = assertThrows(MethodExecutionException.class
         , () -> taskManager.getHistory(), "Исключение не было брошено");
         assertEquals(e.getMessage(), "Ошибка в выводе истории просмотра", "Ошибки не равны");
     }
 
-    private void shouldGetHistoryIfHistoryIsNotEmpty() {
+    @Test
+    void getHistoryShouldGetHistoryIfIsNotEmpty() {
         Task task1 = new Task("Задача1", "Описание1");
         Task task2 = new Task("Задача2", "Описание2");
         taskManager.addNewTaskItem(task1);
@@ -670,18 +596,14 @@ abstract class TaskManagerTest <T extends TaskManager> {
     }
 
     @Test
-    void getHistory() {
-        shouldExceptionWhenHistoryIsEmpty();
-        shouldGetHistoryIfHistoryIsNotEmpty();
-    }
-
-    private void shouldBeExceptionWhenTasksAreEmpty() {
+    void getPrioritizedTasksShouldBeExceptionWhenTasksAreEmpty() {
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.getPrioritizedTasks()
         ,"Исключение не выкидывается");
         assertEquals(e.getMessage(), "Ошибка в выводе приоритета задач", "Ошибки не равны");
     }
 
-    private void shouldGetPrioritizedTasksIsTasksAreNotEmpty() {
+    @Test
+    void getPrioritizedTasksShouldGetPrioritizedTasksIfAreNotEmpty() {
         Task task1 = new Task("Почитать", "Чтение перед сном"
                 ,LocalDateTime.of(2023, Month.JANUARY, 17, 21, 22), Duration.ofMinutes(10));
         Task task2 = new Task("Поиграть", "КС"
@@ -697,11 +619,5 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Task lastTask = taskManager.getPrioritizedTasks().last();
         assertEquals(firstTask, task1, "Задачи не равны");
         assertEquals(lastTask, task4, "Задачи не равны");
-    }
-
-    @Test
-    void getPrioritizedTasks() {
-        shouldBeExceptionWhenTasksAreEmpty();
-        shouldGetPrioritizedTasksIsTasksAreNotEmpty();
     }
 }
