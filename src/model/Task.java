@@ -24,7 +24,6 @@ public class Task {
 
     protected LocalDateTime startTime;
 
-    protected LocalDateTime endTime;
 
     protected Duration duration;
 
@@ -63,15 +62,13 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
-        return endTime;
+        return startTime.plusMinutes(duration.toMinutes());
     }
 
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
+
 
     public void setDuration(Duration duration) {
         this.duration = duration;
@@ -158,7 +155,7 @@ public class Task {
 
     public long getInstantEndTime() {
         if (startTime != null)
-            return ZonedDateTime.of(endTime, ZoneId.of("Europe/Moscow")).toEpochSecond();
+            return ZonedDateTime.of(getEndTime(), ZoneId.of("Europe/Moscow")).toEpochSecond();
         else
             return 0L;
     }
