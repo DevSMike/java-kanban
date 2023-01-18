@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Epic extends Task {
+
+    private LocalDateTime endTime;
+
     // Для хранения индексов сабтасков
     protected  ArrayList<Integer> subtaskIds = new ArrayList<>();
 
@@ -77,5 +80,13 @@ public class Epic extends Task {
     @Override
     public String getType () {
         return "EPIC";
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+       this.endTime = endTime;
+    }
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 }
