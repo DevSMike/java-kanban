@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
 
     static final int SYMBOLS_IN_BEGIN_OF_THE_FILE = 65;
-    File file = new File ("src/resources/test.csv");
+    File file = new File("src/resources/test.csv");
     FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
 
     @BeforeEach
@@ -27,17 +27,19 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
 
     }
 
-    private void shouldBeEmptyFileWhileEmptyListOfTasks()  {
+    @Test
+    void saveShouldBeEmptyFileWhileEmptyListOfTasks() {
         taskManager.save();
         try {
-          String file = Files.readString(Path.of("src/resources/test.csv"));
-          assertEquals(file.length(), SYMBOLS_IN_BEGIN_OF_THE_FILE, "Файл непустой");
+            String file = Files.readString(Path.of("src/resources/test.csv"));
+            assertEquals(file.length(), SYMBOLS_IN_BEGIN_OF_THE_FILE, "Файл непустой");
         } catch (IOException e) {
             throw new MethodExecutionException("Ошибка при выполнении теста save # 1");
         }
     }
 
-    private void shouldBeEpicWithoutSubtasksInSave() {
+    @Test
+     void saveShouldBeEpicWithoutSubtasks() {
         Epic epic = new Epic("1", "f");
         taskManager.addNewEpicItem(epic);
         taskManager.save();
@@ -48,12 +50,14 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
             throw new MethodExecutionException("Ошибка при выполнении теста save # 1");
         }
     }
-
-    private void shouldBeEmptyHistoryWhileEmptyGetHistoryInSave() {
+    @Test
+    void saveShouldBeEmptyHistoryWhileEmptyGetHistory() {
         Epic epic = new Epic("1", "f");
         taskManager.addNewEpicItem(epic);
         Epic epic2 = new Epic("2", "f");
         taskManager.addNewEpicItem(epic2);
+        Epic epic3 = new Epic("3", "f");
+        taskManager.addNewEpicItem(epic3);
         taskManager.save();
         try {
             String file = Files.readString(Path.of("src/resources/test.csv"));
@@ -64,11 +68,17 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         }
     }
 
-    private void shouldPrintHistoryInFileIfItExistInSave() {
-        List<Epic> epics = taskManager.getEpics();
-        taskManager.getEpicById(epics.get(0).getId());
-        taskManager.getEpicById(epics.get(1).getId());
-        taskManager.getEpicById(epics.get(2).getId());
+    @Test
+    void saveShouldPrintHistoryInFileIfItExist() {
+        Epic epic = new Epic("1", "f");
+        taskManager.addNewEpicItem(epic);
+        Epic epic2 = new Epic("2", "f");
+        taskManager.addNewEpicItem(epic2);
+        Epic epic3 = new Epic("3", "f");
+        taskManager.addNewEpicItem(epic3);
+        taskManager.getEpicById(epic.getId());
+        taskManager.getEpicById(epic2.getId());
+        taskManager.getEpicById(epic3.getId());
         taskManager.save();
         try {
             String file = Files.readString(Path.of("src/resources/test.csv"));
@@ -80,14 +90,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     }
 
     @Test
-    void save() {
-        shouldBeEmptyFileWhileEmptyListOfTasks();
-        shouldBeEpicWithoutSubtasksInSave();
-        shouldBeEmptyHistoryWhileEmptyGetHistoryInSave();
-        shouldPrintHistoryInFileIfItExistInSave();
-    }
-
-    private void shouldBeEmptyTaskManagerIfEmptyFile()  {
+    void loadFromFileShouldBeEmptyTaskManagerIfEmptyFile() {
         taskManager.save();
         try {
             FileBackedTasksManager testManager = FileBackedTasksManager.loadFromFile(file);
@@ -96,13 +99,14 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         }
     }
 
-    private void shouldBeEpicWithoutSubtasksInLoad() {
+    @Test
+    void loadFromFileShouldBeEpicWithoutSubtasks() {
         Epic epic = new Epic("1", "f");
         taskManager.addNewEpicItem(epic);
         taskManager.save();
         try {
             FileBackedTasksManager testManager = FileBackedTasksManager.loadFromFile(file);
-            assertEquals(testManager.getEpics().get(0).getName(), epic.getName(), "Эпики не равны" );
+            assertEquals(testManager.getEpics().get(0).getName(), epic.getName(), "Эпики не равны");
             assertEquals(testManager.getEpics().get(0).getStatus(), StatusManager.Statuses.NONE
                     , "Статусы не равны");
         } catch (IOException e) {
@@ -110,160 +114,36 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         }
     }
 
-    private void shouldBeEmptyHistoryWhileEmptyGetHistoryInLoad() {
+    @Test
+    void loadFromFileShouldBeEmptyHistoryWhileEmptyGetHistory() {
         Epic epic = new Epic("2", "f");
         taskManager.addNewEpicItem(epic);
         taskManager.save();
         try {
             FileBackedTasksManager testManager = FileBackedTasksManager.loadFromFile(file);
             MethodExecutionException e = assertThrows(MethodExecutionException.class, testManager::getHistory
-            ,"Исключения не выпадают");
+                    , "Исключения не выпадают");
             assertEquals(e.getMessage(), "Ошибка в выводе истории просмотра", "Ошибки не совпадают");
         } catch (IOException e) {
             throw new MethodExecutionException("Ошибка при выполнении теста load #3");
         }
     }
 
-    private void shouldPrintHistoryInFileIfItExistInLoad() {
-
+    @Test
+    void loadFromFileShouldPrintHistoryInFileIfItExist() {
         try {
             FileBackedTasksManager testManager = FileBackedTasksManager.loadFromFile(file);
-            List<Epic> epics = testManager.getEpics();
-            testManager.getEpicById(epics.get(0).getId());
-            testManager.getEpicById(epics.get(1).getId());
+            Epic epic = new Epic("1", "d");
+            Epic epic2 = new Epic("2", "d");
+            testManager.addNewEpicItem(epic);
+            testManager.addNewEpicItem(epic2);
+            testManager.getEpicById(epic.getId());
+            testManager.getEpicById(epic2.getId());
             testManager.save();
             assertEquals(testManager.getHistory().size(), 2, "Списки не совпадают");
-            assertEquals(testManager.getHistory().get(0), epics.get(0), "Эпики не совпадают");
+            assertEquals(testManager.getHistory().get(0).getName(), epic.getName(), "Эпики не совпадают");
         } catch (IOException e) {
             throw new MethodExecutionException("Ошибка при выполнении теста load #4");
         }
-    }
-
-    @Test
-    void loadFromFile() {
-        shouldBeEmptyTaskManagerIfEmptyFile();
-        shouldBeEpicWithoutSubtasksInLoad();
-        shouldBeEmptyHistoryWhileEmptyGetHistoryInLoad();
-        shouldPrintHistoryInFileIfItExistInLoad();
-    }
-
-    @Test
-    void addNewTaskItem() {
-        super.addNewTaskItem();
-    }
-
-    @Test
-    void addNewEpicItem() {
-        super.addNewEpicItem();
-    }
-
-    @Test
-    void addNewSubtaskItem() {
-        super.addNewSubtaskItem();
-    }
-
-    @Test
-    void getTasks() {
-        super.getTasks();
-    }
-
-    @Test
-    void getEpics() {
-        super.getEpics();
-    }
-
-    @Test
-    void getSubtasks() {
-        super.getSubtasks();
-    }
-
-    @Test
-    void deleteTasks() {
-        super.deleteTasks();
-    }
-
-    @Test
-    void deleteEpics() {
-        super.deleteEpics();
-    }
-
-    @Test
-    void deleteSubtasks() {
-        super.deleteSubtasks();
-    }
-
-    @Test
-    void getTaskById() {
-        super.getTaskById();
-    }
-
-    @Test
-    void getEpicById() {
-        super.getEpicById();
-    }
-
-    @Test
-    void getSubtaskById() {
-        super.getSubtaskById();
-    }
-
-    @Test
-    void updateEpicInfo() {
-        super.updateEpicInfo();
-    }
-
-    @Test
-    void deleteTaskById() {
-        super.deleteTaskById();
-    }
-
-    @Test
-    void deleteEpicById() {
-        super.deleteEpicById();
-    }
-
-    @Test
-    void deleteSubtaskById() {
-        super.deleteSubtaskById();
-    }
-
-    @Test
-    void getSubtaskForEpic() {
-        super.getSubtaskForEpic();
-    }
-
-    @Test
-    void updateTask() {
-        super.updateTask();
-    }
-
-    @Test
-    void updateEpic() {
-        super.updateEpic();
-    }
-
-    @Test
-    void updateSubtask() {
-        super.updateSubtask();
-    }
-
-    @Test
-    void setTaskStatus() {
-        super.setTaskStatus();
-    }
-
-    @Test
-    void setSubtaskStatus() {
-        super.setSubtaskStatus();
-    }
-
-    @Test
-    void getHistory() {
-        super.getHistory();
-    }
-
-    @Test
-    void getPrioritizedTasks() {
-        super.getPrioritizedTasks();
     }
 }
