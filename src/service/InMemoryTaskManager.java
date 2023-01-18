@@ -12,19 +12,12 @@ import java.util.*;
 public class InMemoryTaskManager implements TaskManager {
 
     protected static final DateTimeFormatter DATE_TIME_FORMATTER = Task.DATE_TIME_FORMATTER;
-
     protected  HashMap<Integer, Task> tasks = new HashMap<>();
-
     protected  HashMap<Integer, Epic> epics = new HashMap<>();
-
     protected  HashMap<Integer, Subtask> subtasks = new HashMap<>();
-
     protected  TreeSet<Task> sortedTasks;
-
     protected  HistoryManager historyManager = Managers.getDefaultHistory();
-
     protected int nextId = 1;
-
 
     protected void validateLocalDataInTasks(Task checkTask) {
         try {

@@ -7,7 +7,6 @@ public class Epic extends Task {
 
     private LocalDateTime endTime;
 
-    // Для хранения индексов сабтасков
     protected  ArrayList<Integer> subtaskIds = new ArrayList<>();
 
     public Epic(String taskName, String taskDescription) {

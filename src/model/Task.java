@@ -13,20 +13,12 @@ import java.util.Objects;
 public class Task {
 
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yy|HH:mm:ss");
-
     protected int id;
-
     protected String name;
-
     protected String description;
-
     protected  String status = "";
-
     protected LocalDateTime startTime;
-
-
     protected Duration duration;
-
 
     public Task(String name, String description, LocalDateTime startTime, Duration duration) {
        this.name = name;

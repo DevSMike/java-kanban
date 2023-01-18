@@ -18,9 +18,7 @@ import java.util.TreeSet;
 public class FileBackedTasksManager  extends InMemoryTaskManager implements TaskManager {
 
     private static final int ELEMENTS_IN_TASK_WITH_TIME = 5;
-
     private  static final int ELEMENTS_IN_SUBTASK_WITH_TIME = 6;
-
     private final  File taskData;
 
     public FileBackedTasksManager(File file)  {
