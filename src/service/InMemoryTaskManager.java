@@ -25,6 +25,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     protected int nextId = 1;
 
+
     protected void validateLocalDataInTasks(Task checkTask) {
         try {
             sortedTasks = getPrioritizedTasks();
@@ -38,6 +39,7 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
     }
+
 
     protected void calculateEpicTime(Epic epic) {
         long epicDuration = 0;
@@ -70,14 +72,9 @@ public class InMemoryTaskManager implements TaskManager {
         return true;
     }
 
-    private void setEndTime (Task task) {
-        if (task.getStartTime() != null)
-            task.setEndTime(task.getStartTime().plusMinutes(task.getDuration().toMinutes()));
-    }
-
     @Override
     public void addNewTaskItem(Task task) {
-        setEndTime(task);
+      //  setEndTime(task);
         if (!tryToCreateTask(task)) {
             return;
         }
@@ -99,7 +96,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void addNewSubtaskItem(Subtask subtask) {
-        setEndTime(subtask);
+        //setEndTime(subtask);
         if (!tryToCreateTask(subtask)) {
             return;
         }
@@ -255,8 +252,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (!tasks.containsKey(task.getId())) {
            return;
         }
-        if (task.getEndTime() == null && task.getStartTime() != null)
-            setEndTime(task);
+     //   if (task.getEndTime() == null && task.getStartTime() != null)
+        //    setEndTime(task);
         if (!tryToCreateTask(task))
             return;
         if (task.getStatus() == null)
@@ -269,8 +266,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (!epics.containsKey(epic.getId())) {
             return;
         }
-        if (epic.getEndTime() == null && epic.getStartTime() != null)
-            setEndTime(epic);
+       // if (epic.getEndTime() == null && epic.getStartTime() != null)
+        //    setEndTime(epic);
         if (!tryToCreateTask(epic))
             return;
         epics.put(epic.getId(), epic);
@@ -283,8 +280,8 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         subtask.setEpicId(subtasks.get(subtask.getId()).getEpicId());
-        if (subtask.getEndTime() == null && subtask.getStartTime() != null)
-            setEndTime(subtask);
+        //if (subtask.getEndTime() == null && subtask.getStartTime() != null)
+        //  setEndTime(subtask);
         if (!tryToCreateTask(subtask))
             return;
         if ( subtask.getStatus() == null )
