@@ -23,13 +23,15 @@ class InMemoryHistoryManagerTest {
         taskManager  = new InMemoryTaskManager();
     }
 
-    private void shouldBeEmptyHistoryIfEmpty() {
+    @Test
+    void getHistoryShouldBeEmptyIfEmptyHistory() {
         MethodExecutionException e = assertThrows(MethodExecutionException.class, () -> taskManager.getHistory()
         ,"Исключение не кидается");
         assertEquals(e.getMessage(), "Ошибка в выводе истории просмотра", "ошибки не равны");
     }
 
-    private void shouldBeOneTaskIfTwoIsSimilarInHistory() {
+    @Test
+    void getHistoryShouldBeOneTaskIfTwoIsSimilar() {
         Task task1 = new Task ("1", "D");
         historyManager.add(task1);
         historyManager.add(task1);
@@ -38,37 +40,31 @@ class InMemoryHistoryManagerTest {
         assertEquals(historyManager.getHistory().get(0), task1, "Таски не равны");
     }
 
-    @Test
-    void getHistory() {
-        shouldBeEmptyHistoryIfEmpty();
-        shouldBeOneTaskIfTwoIsSimilarInHistory();
-    }
 
-    private void shouldReturnFalseIfNotContains() {
+    @Test
+     void isContainsIdShouldReturnFalseIfNotContains() {
         Task task = new Task("a", "b");
         taskManager.addNewTaskItem(task);
         assertFalse(historyManager.isContainsId(task.getId()), "Ошибка, содержит");
     }
 
-    private void shouldBeTrueIfContains() {
-        List<Task> tasks = taskManager.getTasks();
-        historyManager.add(tasks.get(0));
-        assertTrue(historyManager.isContainsId(tasks.get(0).getId()), "Ошибка, не содержит");
+    @Test
+    void isContainsIdShouldBeTrueIfContains() {
+        Task task = new Task("a", "b");
+        taskManager.addNewTaskItem(task);
+        historyManager.add(task);
+        assertTrue(historyManager.isContainsId(task.getId()), "Ошибка, не содержит");
     }
 
     @Test
-    void isContainsId() {
-        shouldReturnFalseIfNotContains();
-        shouldBeTrueIfContains();
-    }
-
-    private void shouldNotAddIfDataEqualsNull() {
+    void addShouldNotAddIfDataEqualsNull() {
         Epic epic = null;
         historyManager.add(epic);
         assertEquals(historyManager.getHistory().size(), 0, "Значения не равны");
     }
 
-    private void shouldAddInTheEnd() {
+    @Test
+     void addShouldAddInTheEnd() {
         Task task1 = new Task("1", "D");
         Task task2 = new Task("2", "D");
         task1.setId(0);
@@ -79,12 +75,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void add() {
-        shouldNotAddIfDataEqualsNull();
-        shouldAddInTheEnd();
-    }
-
-    private void shouldDeleteFirstElement() {
+     void removeShouldDeleteFirstElement() {
         Task task1 = new Task("1", "D");
         Task task2 = new Task("2", "D");
         Task task3 = new Task("3", "D");
@@ -102,24 +93,33 @@ class InMemoryHistoryManagerTest {
         assertEquals(historyManager.getHistory().get(0).getName(), task2.getName(), "Задачи не совпадают");
     }
 
-    private void shouldDeleteMiddleElement() {
-        List<Task> tasks = historyManager.getHistory();
-        historyManager.remove(tasks.get(1).getId());
+    @Test
+    void removeShouldDeleteMiddleElement() {
+        Task task1 = new Task("1", "D");
+        Task task2 = new Task("2", "D");
+        Task task3 = new Task("3", "D");
+        task1.setId(0);
+        task2.setId(1);
+        task3.setId(2);
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
+        historyManager.remove(task3.getId());
         assertEquals(historyManager.getHistory().size(), 2, "Размеры не равны");
-        assertEquals(historyManager.getHistory().get(0).getName(), tasks.get(0).getName(), "Задачи не совпадают");
-    }
-
-    private  void shouldDeleteLastElement() {
-        List<Task> tasks = historyManager.getHistory();
-        historyManager.remove(tasks.get(1).getId());
-        assertEquals(historyManager.getHistory().size(), 1, "Размеры не равны");
-        assertEquals(historyManager.getHistory().get(0).getName(), tasks.get(0).getName(), "Задачи не совпадают");
+        assertEquals(historyManager.getHistory().get(0).getName(), task1.getName(), "Задачи не совпадают");
     }
 
     @Test
-    void remove() {
-        shouldDeleteFirstElement();
-        shouldDeleteMiddleElement();
-        shouldDeleteLastElement();
+    void removeShouldDeleteLastElement() {
+        Task task1 = new Task("1", "D");
+        Task task2 = new Task("2", "D");
+        task1.setId(0);
+        task2.setId(1);
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.remove(task2.getId());
+        assertEquals(historyManager.getHistory().size(), 1, "Размеры не равны");
+        assertEquals(historyManager.getHistory().get(0).getName(), task1.getName(), "Задачи не совпадают");
     }
+
 }
