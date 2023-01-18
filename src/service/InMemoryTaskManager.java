@@ -25,7 +25,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     protected int nextId = 1;
 
-
     protected void validateLocalDataInTasks(Task checkTask) {
         try {
             sortedTasks = getPrioritizedTasks();
@@ -39,7 +38,6 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
     }
-
 
     protected void calculateEpicTime(Epic epic) {
         long epicDuration = 0;

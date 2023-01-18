@@ -22,15 +22,16 @@ public class Subtask extends Task {
         this.epicId = epicId;
     }
 
-
     @Override
     public Integer getEpicId() {
         return epicId;
     }
+    
     @Override
     public String getStringEpicId() {
         return Integer.valueOf(epicId).toString();
     }
+    
     public void setEpicId(int epicId) {
         this.epicId = epicId;
     }
