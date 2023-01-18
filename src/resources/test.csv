@@ -1,6 +1,5 @@
 id,type,name,status,description,duration,startTime,endTime,epic
-1,TASK,Почитать,NEW,Чтение перед сном,PT10M,17.01.23|21:22:00,17.01.23|21:32:00,
-2,TASK,Поиграть,NEW,КС,PT10M,18.01.23|21:22:00,18.01.23|21:32:00,
-3,TASK,Посмотреть,NEW,Гром,PT10M,19.01.23|21:22:00,19.01.23|21:32:00,
-4,TASK,Задача,NEW,Сделать,
+1,EPIC,1,NONE,f,
+2,EPIC,2,NONE,f,
+3,EPIC,3,NONE,f,
 
