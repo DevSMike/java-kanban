@@ -82,10 +82,9 @@ public class InMemoryTaskManager implements TaskManager {
         if (!tryToCreateTask(epic)) {
             return;
         }
-        prioritizedTasks.add(epic);
         epic.setId(nextId++);
+        epic.setStatus(StatusManager.Statuses.NONE);
         epics.put(epic.getId(), epic);
-        updateEpicInfo(epic);
     }
 
     @Override
@@ -181,6 +180,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic.getSubtaskIds().isEmpty())
             return;
         for (int itemId : epic.getSubtaskIds()) {
+
             Subtask subtask = subtasks.get(itemId);
             if (subtask == null) {
                 throw new MethodExecutionException("Subtask у Epic равен null");
@@ -211,10 +211,13 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteEpicById(int id) {
         if (epics.isEmpty())
             throw new MethodExecutionException("Невозможно удалить epic by id");
+
         for (int ids : epics.get(id).getSubtaskIds()) {
+            prioritizedTasks.remove(subtasks.get(ids));
             subtasks.remove(ids);
         }
-        prioritizedTasks.remove(epics.get(id));
+        epics.get(id).deleteSubtaskIds();
+        updateEpicInfo(epics.get(id));
         epics.remove(id);
         if (historyManager.isContainsId(id))
              historyManager.remove(id);
@@ -270,7 +273,7 @@ public class InMemoryTaskManager implements TaskManager {
         prioritizedTasks.remove(epics.get(epic.getId()));
         epics.put(epic.getId(), epic);
         prioritizedTasks.add(epic);
-        updateEpicInfo(epic);
+       // updateEpicInfo(epic);
     }
 
     @Override
