@@ -17,7 +17,6 @@ public class Main {
 
         TaskManager taskManager = Managers.getDefault();
 
-
         Task taskN1 = new Task("Прогулка", "Сходить в лес",
                 LocalDateTime.of(2023, Month.JANUARY, 16, 21, 22),  Duration.ofMinutes(200));
         //вылетает
