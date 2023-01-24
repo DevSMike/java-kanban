@@ -26,7 +26,9 @@ public class Epic extends Task {
     }
 
     public ArrayList<Integer> getSubtaskIds() {
-        return subtaskIds;
+        if (subtaskIds != null)
+             return subtaskIds;
+        else return new ArrayList<>();
     }
 
     public int getIemByIndex(int i) {
@@ -34,7 +36,11 @@ public class Epic extends Task {
     }
 
     public void deleteSubtaskIds() {
-        subtaskIds.clear();
+        try {
+            subtaskIds.clear();
+        } catch (NullPointerException e) {
+            System.out.println("Невозможно очистить сабтаски");
+        }
     }
 
     public void deleteSubtaskIdInList(int id) {
