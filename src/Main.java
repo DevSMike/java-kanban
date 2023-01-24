@@ -3,6 +3,7 @@ import model.Subtask;
 import model.Task;
 import service.*;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,8 +14,8 @@ import java.util.ArrayList;
 
 public class Main {
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws IOException {
+        new KVServer().start();
         TaskManager taskManager = Managers.getDefault();
 
         Task taskN1 = new Task("Прогулка", "Сходить в лес",
