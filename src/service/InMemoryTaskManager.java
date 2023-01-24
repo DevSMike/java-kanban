@@ -211,10 +211,13 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteEpicById(int id) {
         if (epics.isEmpty())
             throw new MethodExecutionException("Невозможно удалить epic by id");
-
-        for (int ids : epics.get(id).getSubtaskIds()) {
-            prioritizedTasks.remove(subtasks.get(ids));
-            subtasks.remove(ids);
+        try {
+            for (int ids : epics.get(id).getSubtaskIds()) {
+                prioritizedTasks.remove(subtasks.get(ids));
+                subtasks.remove(ids);
+            }
+        } catch (NullPointerException e) {
+            System.out.println("Сабтаски у данного эпика не имеются");
         }
         epics.get(id).deleteSubtaskIds();
         updateEpicInfo(epics.get(id));
