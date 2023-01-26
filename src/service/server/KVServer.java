@@ -1,8 +1,9 @@
-package service;
+package service.server;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,14 +11,13 @@ import java.util.Map;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
-/**
- * Постман: https://www.getpostman.com/collections/a83b61d9e1c81c10575c
- */
+
 public class KVServer {
     public static final int PORT = 8078;
     private final String apiToken;
     private final HttpServer server;
     private final Map<String, String> data = new HashMap<>();
+ //   private final Gson gson = new Gson();
 
     public KVServer() throws IOException {
         apiToken = generateApiToken();
@@ -27,9 +27,30 @@ public class KVServer {
         server.createContext("/load", this::load);
     }
 
-    private void load(HttpExchange h) {
+    private void load(HttpExchange h) throws IOException {
         // TODO Добавьте получение значения по ключу
-
+        System.out.println("\n/load");
+        if (!hasAuth(h)) {
+            System.out.println("Запрос не авторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
+            h.sendResponseHeaders(403, 0);
+            return;
+        }
+        if ("GET".equals(h.getRequestMethod())) {
+            String key = h.getRequestURI().getPath().substring(("/load".length() +1 ));
+            if (key.isEmpty()) {
+                System.out.println("Key для загрузки пустой. key указывается в пути: /load/{key}");
+                h.sendResponseHeaders(400, 0);
+                return;
+            }
+            String strData = data.getOrDefault(key, "По этому ключу ничего не лежит");
+            h.sendResponseHeaders(200, 0);
+            try (OutputStream os = h.getResponseBody()) {
+                os.write(strData.getBytes());
+            }
+        } else {
+            h.sendResponseHeaders(404, 0);
+            System.out.println("Ошибался запрос GET, а получили другой");
+        }
     }
 
     private void save(HttpExchange h) throws IOException {
@@ -84,6 +105,10 @@ public class KVServer {
         System.out.println("Открой в браузере http://localhost:" + PORT + "/");
         System.out.println("API_TOKEN: " + apiToken);
         server.start();
+    }
+
+    public void deleteAllData() {
+        data.clear();
     }
 
     private String generateApiToken() {
