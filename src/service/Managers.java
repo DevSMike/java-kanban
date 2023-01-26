@@ -1,13 +1,15 @@
 package service;
 
-import java.io.File;
+import service.server.HttpTaskManager;
+
+import java.io.IOException;
 
 public class Managers {
 
-    private static final String PATH = "src/resources/tasksData.csv";
+    private static final String URL = "http://localhost:8078/";
 
-    public static TaskManager getDefault() {
-        return new FileBackedTasksManager(new File(PATH));
+    public static TaskManager getDefault() throws IOException, InterruptedException {
+        return new HttpTaskManager(URL);
     }
 
     public static HistoryManager getDefaultHistory() {
