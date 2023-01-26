@@ -1,114 +1,99 @@
-import model.Epic;
-import model.Subtask;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import model.Task;
-import service.*;
+import service.server.*;
 
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 
 public class MainForFiles {
-
-    private static final String PATH = "src/resources/tasksData.csv";
-    public static void main(String[] args) throws IOException {
-
-        File file = new File(PATH);
-        File file2 = new File ("src/resources/tasksData2.csv");
-
-        TaskManager taskManager = Managers.getDefault();
-
-//        Main.printAllTasksInfo(taskManager);
-     //   Printer.printTaskHistory(taskManager.getHistory());
+    private static final String URL = "http://localhost:8078/";
+    private static final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
+            .registerTypeAdapter(Duration.class, new DurationAdapter()).create();
+    public static void main(String[] args) throws IOException, InterruptedException {
+        new KVServer().start();
+        HttpTaskServer server = new HttpTaskServer();
 
         Task taskN1 = new Task("Прогулка", "Сходить в лес",
-                LocalDateTime.of(2023, Month.JANUARY, 16, 21, 22), Duration.ofMinutes(100));
-        //вылетает
+                LocalDateTime.of(2023, Month.JANUARY, 16, 21, 22),  Duration.ofMinutes(200));
+
         Task taskN2 = new Task("Почитать", "Чтение перед сном"
-                ,LocalDateTime.of(2023, Month.JANUARY, 17, 21, 22), Duration.ofMinutes(10));
-        taskManager.addNewTaskItem(taskN1);
-        taskManager.addNewTaskItem(taskN2);
+                ,LocalDateTime.of(2023, Month.JANUARY, 17, 21, 22),  Duration.ofMinutes(100));
 
-        Epic epicN1 = new Epic("Купить подарки на НГ", "Составить список");
+        HttpClient client = HttpClient.newHttpClient();
+        URI uri = URI.create("http://localhost:8080/tasks/task");
+        String jSonTask = gson.toJson(taskN1);
+        HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(jSonTask);
+        HttpRequest request = HttpRequest.newBuilder().uri(uri).POST(body).build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response);
 
-        Subtask subtaskEpicN1N1 = new Subtask("Купить коробку", "Заказать на Яндекс Маркете"
-                ,LocalDateTime.of(2023, Month.JANUARY, 11, 21, 22), Duration.ofMinutes(11));
-
-        Subtask subtaskEpicN1N2 = new Subtask("Купить ленточку","Заказать на Яндекс Маркете"
-                ,LocalDateTime.of(2023, Month.JANUARY, 8, 21, 22),Duration.ofMinutes(200));
-
-        Subtask subtaskEpicN1N3 = new Subtask("Купить упаковку","Заказать на Яндекс Маркете"
-                ,LocalDateTime.of(2023, Month.JANUARY, 7, 19, 25),Duration.ofMinutes(15));
-
-        Subtask subtaskEpicN1N4 = new Subtask("Купить бантик","Заказать на Яндекс Маркете"
-                ,LocalDateTime.of(2023, Month.JANUARY, 15, 21, 22),Duration.ofMinutes(22));
-
-        Subtask subtaskEpicN1N5 = new Subtask("Купить Попить","Заказать на Яндекс Маркете"
-                ,LocalDateTime.of(2023, Month.JANUARY, 8, 21, 22), Duration.ofMinutes(50));
-        taskManager.addNewEpicItem(epicN1);
-        subtaskEpicN1N1.setEpicId(epicN1.getId());
-        subtaskEpicN1N2.setEpicId(epicN1.getId());
-        subtaskEpicN1N3.setEpicId(epicN1.getId());
-        subtaskEpicN1N4.setEpicId(epicN1.getId());
-        subtaskEpicN1N5.setEpicId(epicN1.getId());
-
-        taskManager.addNewSubtaskItem(subtaskEpicN1N1);
-        taskManager.addNewSubtaskItem(subtaskEpicN1N2);
-        taskManager.addNewSubtaskItem(subtaskEpicN1N3);
-        taskManager.addNewSubtaskItem(subtaskEpicN1N4);
-        taskManager.addNewSubtaskItem(subtaskEpicN1N5);
+        request = HttpRequest.newBuilder().uri(uri).GET().build();
+        response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
 
 
+        server.stop();
+        HttpTaskServer server1 = new HttpTaskServer();
+        jSonTask = gson.toJson(taskN2);
+        body = HttpRequest.BodyPublishers.ofString(jSonTask);
+        request = HttpRequest.newBuilder().uri(uri).POST(body).build();
+         response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response);
 
-        Task newTask = new Task("Задание", "Нужно сделать");
-        taskManager.addNewTaskItem(newTask);
+        request = HttpRequest.newBuilder().uri(uri).GET().build();
+        response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
 
-        Task newTask2 = new Task("Игра", "Нужно сделать");
-        taskManager.addNewTaskItem(newTask2);
+    }
+}
+class LocalDateAdapter extends TypeAdapter<LocalDateTime> {
+    private static final DateTimeFormatter formatterWriter = DateTimeFormatter.ofPattern("dd.MM.yy|HH:mm:ss");
+    private static final DateTimeFormatter formatterReader = DateTimeFormatter.ofPattern("dd.MM.yy|HH:mm:ss");
 
-        Main.printAllTasksInfo(taskManager);
-        System.out.println("ВЫВОД СОРИТРОВАННЫХ ПРИОРИТЕТОВ ЗАДАЧ");
-        System.out.println(taskManager.getPrioritizedTasks());
+    @Override
+    public void write(final JsonWriter jsonWriter, LocalDateTime localDate) throws IOException {
+        try {
+            jsonWriter.value(localDate.format(formatterWriter));
+        } catch (NullPointerException e) {
+            System.out.println("На вход Time не передавалось!");
+            jsonWriter.value("NONE");
+        }
+    }
 
-        // ВЫЗЫВАЕМ ИСТОРИЮ ПРОСМОТРА
-        taskManager.getEpicById(epicN1.getId());
-        taskManager.getTaskById(taskN1.getId());
-        taskManager.getTaskById(taskN2.getId());
-        taskManager.getTaskById(taskN1.getId());
-        taskManager.getSubtaskById(subtaskEpicN1N1.getId());
-        taskManager.getSubtaskById(subtaskEpicN1N2.getId());
-        taskManager.getSubtaskById(subtaskEpicN1N4.getId());
+    @Override
+    public LocalDateTime read(final JsonReader jsonReader) throws IOException {
+        return LocalDateTime.parse(jsonReader.nextString(), formatterReader);
+    }
+}
 
+class DurationAdapter extends TypeAdapter<Duration> {
 
-        System.out.println();
-        Main.printAllTasksInfo(taskManager);
-        Printer.printTaskHistory(taskManager.getHistory());
+    @Override
+    public void write(final JsonWriter jsonWriter, final Duration duration) throws IOException {
+        Optional<Duration> optDuration = Optional.ofNullable(duration);
+        if (optDuration.isPresent()) {
+            jsonWriter.value(optDuration.get().toMinutes());
+        } else {
+            jsonWriter.value(0L);
+        }
+    }
 
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        System.out.println("Создаём новый менеджер по данным старого!");
-      //  FileBackedTasksManager newFb = new FileBackedTasksManager(file);
-
-         FileBackedTasksManager  newFb = FileBackedTasksManager.loadFromFile(file);
-
-        Task task3 = new Task("Отдых", "Украсить ёлку"
-                ,LocalDateTime.of(2023, Month.JANUARY, 17, 21, 22), Duration.ofMinutes(2000));
-        newFb.addNewTaskItem(task3);
-        Main.printAllTasksInfo(newFb);
-        Printer.printTaskHistory(newFb.getHistory());
-
-        System.out.println("\n Третий файл менеджер");
-        FileBackedTasksManager tempFb = new FileBackedTasksManager(file2);
-        Task taskN3 = new Task("Поиграть", "КС"
-                ,LocalDateTime.of(2023, Month.JANUARY, 12, 13, 22), Duration.ofMinutes(1000));
-        tempFb.addNewTaskItem(taskN3);
-        System.out.println(tempFb.getTasks());
-
-
-
-
-
+    @Override
+    public Duration read(final JsonReader jsonReader) throws IOException {
+        return Duration.ofMinutes(Long.parseLong(jsonReader.nextString()));
     }
 }
