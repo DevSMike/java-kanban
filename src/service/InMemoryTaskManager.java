@@ -38,9 +38,18 @@ public class InMemoryTaskManager implements TaskManager {
         LocalDateTime maxEndTime = LocalDateTime.now();
         for (int id: epic.getSubtaskIds()) {
             Subtask subtask = subtasks.get(id);
+            if (subtask == null) {
+                continue;
+            }
             if (id == epic.getSubtaskIds().get(0)) {
-                minStartTime = subtask.getStartTime();
-                maxEndTime = subtask.getEndTime();
+                try {
+                    minStartTime = subtask.getStartTime();
+                    maxEndTime = subtask.getEndTime();
+                } catch (NullPointerException e) {
+                    System.out.println("У сабтасков время отсутсвует");
+                    return;
+                }
+
             }
             epicDuration += Duration.ofMinutes(subtask.getDuration().toMinutes()).toMinutes();
             if (subtask.getStartTime().isBefore(minStartTime))
@@ -97,7 +106,11 @@ public class InMemoryTaskManager implements TaskManager {
         subtask.setStatus(StatusManager.Statuses.NEW);
         subtasks.put(subtask.getId(), subtask);
         Epic epic = epics.get(subtask.getEpicId());
-        epic.setSubtaskIds(subtask.getId());
+        if (epic == null) {
+            return;
+        }
+        if (!epic.getSubtaskIds().contains(subtask.getId()))
+             epic.setSubtaskIds(subtask.getId());
         updateEpicInfo(epic);
     }
 
@@ -183,7 +196,9 @@ public class InMemoryTaskManager implements TaskManager {
 
             Subtask subtask = subtasks.get(itemId);
             if (subtask == null) {
-                throw new MethodExecutionException("Subtask у Epic равен null");
+                //throw new MethodExecutionException("Subtask у Epic равен null");
+
+                continue;
             }
             if (isNewStatus = subtask.getStatus() == StatusManager.Statuses.NEW) { newCount++; }
             if (isDoneStatus = subtask.getStatus() == StatusManager.Statuses.DONE) { doneCount++; }
@@ -231,11 +246,13 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtasks.isEmpty())
             throw new MethodExecutionException("Невозможно удалить subtask by id");
         Epic epic = epics.get(subtasks.get(id).getEpicId());
-        epic.deleteSubtaskIdInList(subtasks.get(id).getId());
         prioritizedTasks.remove(subtasks.get(id));
-        subtasks.remove(id);
         if (historyManager.isContainsId(id))
             historyManager.remove(id);
+        if (epic == null)
+            return;
+        epic.deleteSubtaskIdInList(subtasks.get(id).getId());
+        subtasks.remove(id);
         updateEpicInfo(epic);
     }
 
