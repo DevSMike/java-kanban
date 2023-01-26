@@ -53,6 +53,7 @@ public class HttpTaskServer  {
             System.out.println("Это первый вызов manager");
         }
     }
+    
     public void stop() {
         httpServer.stop(0);
     }
