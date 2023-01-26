@@ -9,6 +9,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Task {
 
@@ -25,6 +26,11 @@ public class Task {
        this.description = description;
        this.startTime = startTime;
        this.duration = duration;
+    }
+    public Task(String name, String description, LocalDateTime startTime) {
+        this.name = name;
+        this.description = description;
+        this.startTime = startTime;
     }
 
     public Task(String name, String description) {
@@ -54,6 +60,7 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
+        duration = getDuration();
         return startTime.plusMinutes(duration.toMinutes());
     }
 
@@ -67,7 +74,8 @@ public class Task {
     }
 
     public Duration getDuration() {
-        return duration;
+        Optional<Duration> optDuration = Optional.ofNullable(duration);
+        return optDuration.orElse(Duration.ofMinutes(0L));
     }
 
     public void setStatus(StatusManager.Statuses id) {
