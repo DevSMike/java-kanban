@@ -2,21 +2,23 @@ import model.Epic;
 import model.Subtask;
 import model.Task;
 import service.*;
-
+import service.server.HttpTaskManager;
+import service.server.KVServer;
 import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.ArrayList;
-
+import java.time.format.DateTimeFormatter;
 
 
 public class Main {
+    private static final DateTimeFormatter formatterReader = DateTimeFormatter.ofPattern("dd.MM.yy|HH:mm:ss");
+    private static final String URL = "http://localhost:8078/";
+    public static void main(String[] args) throws IOException, InterruptedException {
 
-    public static void main(String[] args) throws IOException {
-        new KVServer().start();
-        TaskManager taskManager = Managers.getDefault();
+      KVServer server =  new KVServer();
+      server.start();
+      HttpTaskManager taskManager =  new HttpTaskManager("http://localhost:8078/");
 
         Task taskN1 = new Task("Прогулка", "Сходить в лес",
                 LocalDateTime.of(2023, Month.JANUARY, 16, 21, 22),  Duration.ofMinutes(200));
@@ -33,6 +35,8 @@ public class Main {
                 ,LocalDateTime.of(2023, Month.JANUARY, 8, 21, 22), Duration.ofMinutes(10));
 
         taskManager.addNewEpicItem(epicN1);
+        Subtask subtask = new Subtask(2, "Прогулка", "Погулять", "NEW", epicN1.getId());
+        taskManager.addNewSubtaskItem(subtask);
         subtaskEpicN1N1.setEpicId(epicN1.getId());
         subtaskEpicN1N2.setEpicId(epicN1.getId());
         taskManager.addNewSubtaskItem(subtaskEpicN1N1);
@@ -55,20 +59,9 @@ public class Main {
         System.out.println("_____ПОСЛЕ СМЕНЫ СТАТУСОВ_____");
         printAllTasksInfo(taskManager);
 
-        System.out.println("_____ПОСЛЕ ОБНОВЛЕНИЯ  ЭПИКОВ_____");
-
-        Epic epicN3 = new Epic("Тренировка", "План пробежки");
-        epicN3.setId(epicN2.getId());
-        epicN3.updateSubtaskIds(epicN2);
-        taskManager.updateEpic(epicN3);
 
 
-        Subtask subtaskEpicN3N1 = new Subtask("Купить бантик","Заказать на Яндекс Маркете"
-                ,LocalDateTime.of(2023, Month.JANUARY, 15, 21, 22), Duration.ofMinutes(22));
-        subtaskEpicN3N1.setId(subtaskEpicN2N1.getId());
-        subtaskEpicN3N1.setStatus(subtaskEpicN2N1.getStatus());
-        subtaskEpicN3N1.setEpicId(subtaskEpicN2N1.getEpicId());
-        taskManager.updateSubtask(subtaskEpicN3N1);
+
 
 
         printAllTasksInfo(taskManager);
@@ -78,20 +71,24 @@ public class Main {
         taskManager.getTaskById(taskN1.getId());
         taskManager.getTaskById(taskN2.getId());
         taskManager.getSubtaskById(subtaskEpicN1N1.getId());
-        taskManager.getSubtaskById(subtaskEpicN3N1.getId());
+
         taskManager.getEpicById(epicN1.getId());
         taskManager.getEpicById(epicN1.getId());
-        taskManager.getEpicById(epicN3.getId());
+
         taskManager.getTaskById(taskN1.getId());
         taskManager.getTaskById(taskN1.getId());
         taskManager.getTaskById(taskN2.getId());
-        taskManager.getEpicById(epicN3.getId());
+
 
         Printer.printTaskHistory(taskManager.getHistory());
         System.out.println();
 
         taskManager.deleteTaskById(taskN2.getId());
         Printer.printTaskHistory(taskManager.getHistory());
+
+      System.out.println("Получить новый HTTP TASK MANAGER");
+      HttpTaskManager newTaskManager = HttpTaskManager.loadFromServer(URL);
+      System.out.println(newTaskManager.getTasks());
     }
 
     public static void printAllTasksInfo(TaskManager inMemoryTaskManager) {
@@ -105,3 +102,4 @@ public class Main {
 
 
 }
+
