@@ -20,7 +20,8 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
 
     private static final int ELEMENTS_IN_TASK_WITH_TIME = 5;
     private  static final int ELEMENTS_IN_SUBTASK_WITH_TIME = 6;
-    private final  File taskData;
+    private final File taskData;
+
 
     public FileBackedTasksManager(File file)  {
         if (!file.exists()) {
@@ -32,6 +33,8 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
         }
         taskData = file;
     }
+
+
 
     public void save()  {
         try (FileWriter file = new FileWriter(taskData, false)) {
@@ -122,7 +125,6 @@ public class FileBackedTasksManager  extends InMemoryTaskManager implements Task
         }
         return manager.historyManager.getHistory();
     }
-
 
     private static void fromString(String[] params, FileBackedTasksManager manager) {
         switch (params[1]) {
