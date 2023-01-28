@@ -7,10 +7,9 @@ import model.Epic;
 import model.Subtask;
 import model.Task;
 import service.InMemoryTaskManager;
+import service.Managers;
 import service.StatusManager;
 import service.TaskManager;
-
-import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,10 +26,10 @@ public class HttpTaskManager extends InMemoryTaskManager implements TaskManager 
     private static final String KEY_PRIORITIZED_TASKS = "allTasks";
 
     private final KVTaskClient client;
-    private static final Gson gson = new Gson();
+    private static final Gson gson = Managers.getDefaultGson();
 
 
-    public HttpTaskManager(String url) throws IOException, InterruptedException {
+    public HttpTaskManager(String url) {
         client = new KVTaskClient(url);
     }
 
@@ -50,7 +49,7 @@ public class HttpTaskManager extends InMemoryTaskManager implements TaskManager 
         }
     }
 
-    public static HttpTaskManager loadFromServer(String url) throws IOException, InterruptedException {
+    public static HttpTaskManager loadFromServer(String url) {
         HttpTaskManager newTaskManager = new HttpTaskManager(url);
         ArrayList<Task> historyList = new ArrayList<>();
         try {
@@ -102,7 +101,6 @@ public class HttpTaskManager extends InMemoryTaskManager implements TaskManager 
         allTasks.addAll(tasks);
         allTasks.addAll(epics);
         allTasks.addAll(subtasks);
-
         return allTasks;
     }
 
