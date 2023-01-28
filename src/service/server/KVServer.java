@@ -17,7 +17,6 @@ public class KVServer {
     private final String apiToken;
     private final HttpServer server;
     private final Map<String, String> data = new HashMap<>();
- //   private final Gson gson = new Gson();
 
     public KVServer() throws IOException {
         apiToken = generateApiToken();
@@ -28,7 +27,6 @@ public class KVServer {
     }
 
     private void load(HttpExchange h) throws IOException {
-        // TODO Добавьте получение значения по ключу
         System.out.println("\n/load");
         if (!hasAuth(h)) {
             System.out.println("Запрос не авторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
