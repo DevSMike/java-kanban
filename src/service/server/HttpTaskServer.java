@@ -26,8 +26,7 @@ public class HttpTaskServer  {
     final static private int PORT = 8080;
     private static final String URL = "http://localhost:8078/";
     TaskManager tasksManager = Managers.getDefault();
-    private final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
-            .registerTypeAdapter(Duration.class, new DurationAdapter()).create();
+    private final Gson gson = Managers.getDefaultGson();
     HttpServer httpServer;
     public HttpTaskServer() throws IOException, InterruptedException {
         try {
